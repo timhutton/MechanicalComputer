@@ -1,0 +1,1 @@
+An attempt to make a physical (no electricity!) computer that is Turing-complete, based on the rule 110 cellular automata.
