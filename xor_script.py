@@ -36,12 +36,26 @@ Cgear.animation_data_clear()
 Dgear = bpy.data.objects.get("D_gear")
 Dgear.animation_data_clear()
 E = bpy.data.objects.get("E")
+E.animation_data_clear()
 F = bpy.data.objects.get("F")
+F.animation_data_clear()
+G = bpy.data.objects.get("G")
+G.animation_data_clear()
+H = bpy.data.objects.get("H")
+H.animation_data_clear()
+Output1 = bpy.data.objects.get("output1")
+Output1.animation_data_clear()
+Output2 = bpy.data.objects.get("output2")
+Output2.animation_data_clear()
+Output3 = bpy.data.objects.get("output3")
+Output3.animation_data_clear()
 
 travel = 0.2  # how far the inputs move
-input_x_offset = 0.3
-cd_x_offset = 0.1
-cd_gear_x_offset = 0.25
+input_x_offset = 0.1
+cd_x_offset = -0.1
+cd_gear_x_offset = 0.15
+gh_x_offset = 0.0
+output12_x_offset = 0.43
 
 for keyframe in keyframes:
     frame = keyframe['frame']
@@ -50,7 +64,11 @@ for keyframe in keyframes:
     not_a = 1 - a
     not_b = 1 - b
     c = (a + not_b) / 2
-    d = (not_a + b) / 2
+    d = (not_a + b) / 2  # always the inverse of c?
+    g = c * 2 - 1
+    h = d * 2 - 1 # always the inverse of g? if so could replace d, f and d_gear with a single gear inverting g
+    output1 = max(g, min(a, not_b))  # pulled back by a and not_b, pushed forward by g
+    output2 = max(h, min(not_a, b))  # pulled back by not_a and b, pushed forward by h
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
     B.location[0] = input_x_offset + b * travel
@@ -79,3 +97,11 @@ for keyframe in keyframes:
     E.keyframe_insert(data_path="rotation_euler", frame=frame)
     F.rotation_euler.z = -d * math.pi
     F.keyframe_insert(data_path="rotation_euler", frame=frame)
+    G.location[0] = gh_x_offset + g * travel
+    G.keyframe_insert(data_path="location", frame=frame, index=0)
+    H.location[0] = gh_x_offset + h * travel
+    H.keyframe_insert(data_path="location", frame=frame, index=0)
+    Output1.location[0] = output12_x_offset + output1 * travel
+    Output1.keyframe_insert(data_path="location", frame=frame, index=0)
+    Output2.location[0] = output12_x_offset + output2 * travel
+    Output2.keyframe_insert(data_path="location", frame=frame, index=0)
