@@ -35,6 +35,8 @@ Cgear = bpy.data.objects.get("C_gear")
 Cgear.animation_data_clear()
 Dgear = bpy.data.objects.get("D_gear")
 Dgear.animation_data_clear()
+E = bpy.data.objects.get("E")
+F = bpy.data.objects.get("F")
 
 travel = 0.2  # how far the inputs move
 input_x_offset = 0.3
@@ -73,3 +75,7 @@ for keyframe in keyframes:
     Dgear.keyframe_insert(data_path="location", frame=frame, index=0)
     Dgear.rotation_euler.z = (not_a - b) * math.pi / 2
     Dgear.keyframe_insert(data_path="rotation_euler", frame=frame)
+    E.rotation_euler.z = -c * math.pi
+    E.keyframe_insert(data_path="rotation_euler", frame=frame)
+    F.rotation_euler.z = -d * math.pi
+    F.keyframe_insert(data_path="rotation_euler", frame=frame)
