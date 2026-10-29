@@ -29,16 +29,12 @@ invertB = bpy.data.objects.get("invert_B")
 invertB.animation_data_clear()
 C = bpy.data.objects.get("C")
 C.animation_data_clear()
-D = bpy.data.objects.get("D")
-D.animation_data_clear()
 Cgear = bpy.data.objects.get("C_gear")
 Cgear.animation_data_clear()
-Dgear = bpy.data.objects.get("D_gear")
-Dgear.animation_data_clear()
 E = bpy.data.objects.get("E")
 E.animation_data_clear()
-F = bpy.data.objects.get("F")
-F.animation_data_clear()
+L = bpy.data.objects.get("L")
+L.animation_data_clear()
 G = bpy.data.objects.get("G")
 G.animation_data_clear()
 H = bpy.data.objects.get("H")
@@ -73,9 +69,8 @@ for keyframe in keyframes:
     not_a = 1 - a
     not_b = 1 - b
     c = (a + not_b) / 2
-    d = (not_a + b) / 2  # always the inverse of c?
     g = c * 2 - 1
-    h = d * 2 - 1 # always the inverse of g? if so could replace d, f and d_gear with a single gear inverting g
+    h = -g
     output1 = max(g, min(a, not_b))  # pulled back by a and not_b, pushed forward by g
     output2 = max(h, min(not_a, b))  # pulled back by not_a and b, pushed forward by h
     j = (output1 + output2) / 2
@@ -93,20 +88,12 @@ for keyframe in keyframes:
     invertB.keyframe_insert(data_path="rotation_euler", frame=frame)
     C.location[0] = cd_x_offset + c * travel
     C.keyframe_insert(data_path="location", frame=frame, index=0)
-    D.location[0] = cd_x_offset + d * travel
-    D.keyframe_insert(data_path="location", frame=frame, index=0)
     Cgear.location[0] = cd_gear_x_offset + c * travel
     Cgear.keyframe_insert(data_path="location", frame=frame, index=0)
     Cgear.rotation_euler.z = (not_b - a) * math.pi / 2
     Cgear.keyframe_insert(data_path="rotation_euler", frame=frame)
-    Dgear.location[0] = cd_gear_x_offset + d * travel
-    Dgear.keyframe_insert(data_path="location", frame=frame, index=0)
-    Dgear.rotation_euler.z = (not_a - b) * math.pi / 2
-    Dgear.keyframe_insert(data_path="rotation_euler", frame=frame)
     E.rotation_euler.z = -c * math.pi
     E.keyframe_insert(data_path="rotation_euler", frame=frame)
-    F.rotation_euler.z = -d * math.pi
-    F.keyframe_insert(data_path="rotation_euler", frame=frame)
     G.location[0] = gh_x_offset + g * travel
     G.keyframe_insert(data_path="location", frame=frame, index=0)
     H.location[0] = gh_x_offset + h * travel
@@ -123,5 +110,7 @@ for keyframe in keyframes:
     Jgear.keyframe_insert(data_path="rotation_euler", frame=frame)
     K.rotation_euler.y = j * math.pi
     K.keyframe_insert(data_path="rotation_euler", frame=frame)
+    L.rotation_euler.y = (g - h) * math.pi / 4
+    L.keyframe_insert(data_path="rotation_euler", frame=frame)
     Output3.location[0] = output3_x_offset + 2 * j * travel
     Output3.keyframe_insert(data_path="location", frame=frame, index=0)
