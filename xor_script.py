@@ -47,6 +47,12 @@ Output1 = bpy.data.objects.get("output1")
 Output1.animation_data_clear()
 Output2 = bpy.data.objects.get("output2")
 Output2.animation_data_clear()
+J = bpy.data.objects.get("J")
+J.animation_data_clear()
+Jgear = bpy.data.objects.get("J_gear")
+Jgear.animation_data_clear()
+K = bpy.data.objects.get("K")
+K.animation_data_clear()
 Output3 = bpy.data.objects.get("output3")
 Output3.animation_data_clear()
 
@@ -56,6 +62,9 @@ cd_x_offset = -0.1
 cd_gear_x_offset = 0.15
 gh_x_offset = 0.0
 output12_x_offset = 0.43
+j_x_offset = 0.6
+jgear_x_offset = 0.7
+output3_x_offset = 0.7
 
 for keyframe in keyframes:
     frame = keyframe['frame']
@@ -69,6 +78,7 @@ for keyframe in keyframes:
     h = d * 2 - 1 # always the inverse of g? if so could replace d, f and d_gear with a single gear inverting g
     output1 = max(g, min(a, not_b))  # pulled back by a and not_b, pushed forward by g
     output2 = max(h, min(not_a, b))  # pulled back by not_a and b, pushed forward by h
+    j = (output1 + output2) / 2
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
     B.location[0] = input_x_offset + b * travel
@@ -105,3 +115,13 @@ for keyframe in keyframes:
     Output1.keyframe_insert(data_path="location", frame=frame, index=0)
     Output2.location[0] = output12_x_offset + output2 * travel
     Output2.keyframe_insert(data_path="location", frame=frame, index=0)
+    J.location[0] = j_x_offset + j * travel
+    J.keyframe_insert(data_path="location", frame=frame, index=0)
+    Jgear.location[0] = jgear_x_offset + j * travel
+    Jgear.keyframe_insert(data_path="location", frame=frame, index=0)
+    Jgear.rotation_euler.y = (output2 - output1) * math.pi / 2
+    Jgear.keyframe_insert(data_path="rotation_euler", frame=frame)
+    K.rotation_euler.y = j * math.pi
+    K.keyframe_insert(data_path="rotation_euler", frame=frame)
+    Output3.location[0] = output3_x_offset + 2 * j * travel
+    Output3.keyframe_insert(data_path="location", frame=frame, index=0)
