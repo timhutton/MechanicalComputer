@@ -1,0 +1,49 @@
+What operations do push-rods and gears allow?
+Can we search over the space of possibilities to find the optimal configuration?
+
+Input and output rods have positions in [0,1].
+One rod pushes another: b = max(a, b)  [0 gears]
+One rod pulls another: b = min(a, b)   [0 gears]
+An anchored gear between two rods: b = 1 - a    [1 gear]
+A double gear with two rods on the same side: b = 2a    [1 gear with 2 radii]
+(or any fixed multiplier)
+Double rack with a pinion mounted on rod c: c = (a + b) / 2   [1 gear]
+Adding/subtracting a fixed value is free, just affects a rod's length.
+
+Composing Anthony Zhang's AND and OR gates to make XOR:
+
+Overview: output3 = A XOR B = (A AND notB) OR (notA AND B) = output1 OR output2
+
+not_a = 1 - a
+c = (a + not_b) / 2
+g = 2c - 1
+output1 is pushed by g, pulled by a and not_b: output1 = max(g, min(a, not_b))
+not_b = 1 - b
+d = (not_a + b) / 2
+h = 2d - 1
+output2 is pushed by h, pulled by not_a and b: output2 = max(h, min(not_a, b))
+j = (output1 + output2) / 2
+k = 2j - 1
+output3 is pushed by k, pulled by output1 and output2: output3 = max(k, min(output1, output2))
+
+Total: 13 rods (a, b, not_a, not_b, c, d, g, h, output1, output2, j, k, output3), 8 gears
+
+Can make 2 simplifications:
+1) k is already xor(a, b), since output1 and output2 are never both 1 at the same time. Hence can use k as output3, saving 1 rod.
+2) d is always the inverse of c, so can remove d and drive h as h = -g, saving 1 gear and 1 rod.
+
+The chain is now:
+
+not_a = 1 - a
+c = (a + not_b) / 2
+g = 2c - 1
+output1 is pushed by g, pulled by a and not_b: output1 = max(g, min(a, not_b))
+not_b = 1 - b
+h = -g
+output2 is pushed by h, pulled by not_a and b: output2 = max(h, min(not_a, b))
+j = (output1 + output2) / 2
+output3 = 2j
+
+Total: 11 rods (a, b, not_a, not_b, c, g, output1, h, output2, j, output3), 7 gears.
+
+Can we do better? Or prove this is optimal?
