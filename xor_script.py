@@ -54,13 +54,14 @@ Output3.animation_data_clear()
 
 travel = 0.2  # how far the inputs move
 input_x_offset = 0.1
-cd_x_offset = -0.1
-cd_gear_x_offset = 0.15
+cd_x_offset = -0.135
+cd_gear_x_offset = 0.16
 gh_x_offset = 0.0
 output12_x_offset = 0.43
-j_x_offset = 0.6
+j_x_offset = 0.59 
 jgear_x_offset = 0.7
 output3_x_offset = 0.7
+rotation_factor = math.pi * 0.85  # radians per [0,1] distance travelled for meshing
 
 for keyframe in keyframes:
     frame = keyframe['frame']
@@ -90,9 +91,9 @@ for keyframe in keyframes:
     C.keyframe_insert(data_path="location", frame=frame, index=0)
     Cgear.location[0] = cd_gear_x_offset + c * travel
     Cgear.keyframe_insert(data_path="location", frame=frame, index=0)
-    Cgear.rotation_euler.z = (not_b - a) * math.pi / 2
+    Cgear.rotation_euler.z = (not_b - a) * rotation_factor / 2
     Cgear.keyframe_insert(data_path="rotation_euler", frame=frame)
-    E.rotation_euler.z = -c * math.pi
+    E.rotation_euler.z = -c * rotation_factor
     E.keyframe_insert(data_path="rotation_euler", frame=frame)
     G.location[0] = gh_x_offset + g * travel
     G.keyframe_insert(data_path="location", frame=frame, index=0)
@@ -108,7 +109,7 @@ for keyframe in keyframes:
     Jgear.keyframe_insert(data_path="location", frame=frame, index=0)
     Jgear.rotation_euler.y = (output2 - output1) * math.pi / 2
     Jgear.keyframe_insert(data_path="rotation_euler", frame=frame)
-    K.rotation_euler.y = j * math.pi
+    K.rotation_euler.y = j * rotation_factor
     K.keyframe_insert(data_path="rotation_euler", frame=frame)
     L.rotation_euler.y = (g - h) * math.pi / 4
     L.keyframe_insert(data_path="rotation_euler", frame=frame)
