@@ -14,17 +14,17 @@ Composing Anthony Zhang's AND and OR gates to make XOR:
 
 Overview: output3 = A XOR B = (A AND notB) OR (notA AND B) = output1 OR output2
 
-not_a = 1 - a
+not_b = 1 - b
 c = (a + not_b) / 2
 g = 2c - 1
-output1 is pushed by g, pulled by a and not_b: output1 = max(g, min(a, not_b))
-not_b = 1 - b
+output1 = max(g, min(a, not_b))  [pushed by g, pulled by a and not_b]
+not_a = 1 - a
 d = (not_a + b) / 2
 h = 2d - 1
-output2 is pushed by h, pulled by not_a and b: output2 = max(h, min(not_a, b))
+output2 = max(h, min(not_a, b))  [pushed by h, pulled by not_a and b]
 j = (output1 + output2) / 2
 k = 2j - 1
-output3 is pushed by k, pulled by output1 and output2: output3 = max(k, min(output1, output2))
+output3 = max(k, min(output1, output2))  [pushed by k, pulled by output1 and output2]
 
 Total: 13 rods (a, b, not_a, not_b, c, d, g, h, output1, output2, j, k, output3), 8 gears
 
@@ -34,13 +34,13 @@ Can make 2 simplifications:
 
 The chain is now:
 
-not_a = 1 - a
+not_b = 1 - b
 c = (a + not_b) / 2
 g = 2c - 1
-output1 is pushed by g, pulled by a and not_b: output1 = max(g, min(a, not_b))
-not_b = 1 - b
+output1 = max(g, min(a, not_b))  [pushed by g, pulled by a and not_b]
+not_a = 1 - a
 h = -g
-output2 is pushed by h, pulled by not_a and b: output2 = max(h, min(not_a, b))
+output2 = max(h, min(not_a, b))  [pushed by h, pulled by not_a and b]
 j = (output1 + output2) / 2
 output3 = 2j
 
