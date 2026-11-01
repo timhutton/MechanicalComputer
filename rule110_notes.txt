@@ -1,0 +1,9 @@
+Rule 110:
+
+ABC ABC ABC ABC ABC ABC ABC ABC
+111 110 101 100 011 010 001 000
+ 0   1   1   0   1   1   1   0
+
+= (B XOR C) OR (notA AND B)
+
+Many other expressions are possible.
