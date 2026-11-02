@@ -7,6 +7,7 @@ bpy.data.scenes[0].frame_end = num_frames
  
 keyframes = [
         {'frame':0, 'a':0, 'b':0, 'c':0}, 
+        {'frame':10, 'a':0, 'b':0, 'c':0}, 
         {'frame':50, 'a':0, 'b':0, 'c':1},
         {'frame':60, 'a':0, 'b':0, 'c':1},
         {'frame':100, 'a':0, 'b':1, 'c':1},
@@ -73,6 +74,12 @@ M = bpy.data.objects.get("M")
 M.animation_data_clear()
 Mgear = bpy.data.objects.get("M_gear")
 Mgear.animation_data_clear()
+N = bpy.data.objects.get("N")
+N.animation_data_clear()
+P = bpy.data.objects.get("P")
+P.animation_data_clear()
+Output4 = bpy.data.objects.get("output4")
+Output4.animation_data_clear()
 
 travel = 0.2  # how far the inputs move
 input_x_offset = 0.1
@@ -83,7 +90,9 @@ output12_x_offset = 0.43
 j_x_offset = 0.85  
 jgear_x_offset = 0.7
 output3_x_offset = 0.85
+p_x_offset = -0.124
 rotation_factor = math.pi * 0.85  # radians per [0,1] distance travelled for meshing
+output4_x_offset = 0.193
 
 for keyframe in keyframes:
     frame = keyframe['frame']
@@ -97,9 +106,12 @@ for keyframe in keyframes:
     f = (c + not_b) / 2
     g = f * 2 - 1
     h = -g
+    p = m * 2 - 1
     output1 = max(g, min(c, not_b))  # pulled back by c and not_b, pushed forward by g
     output2 = max(h, min(not_c, b))  # pulled back by not_c and b, pushed forward by h
     j = (output1 + output2) / 2
+    output3 = j * 2
+    output4 = max(p, min(b, not_a))  # pulled back by b and not_a, pushed forward by p
     
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
@@ -145,7 +157,7 @@ for keyframe in keyframes:
     K.keyframe_insert(data_path="rotation_euler", frame=frame)
     L.rotation_euler.y = (g - h) * rotation_factor / 4
     L.keyframe_insert(data_path="rotation_euler", frame=frame)
-    Output3.location[0] = output3_x_offset + 2 * j * travel
+    Output3.location[0] = output3_x_offset + output3 * travel
     Output3.keyframe_insert(data_path="location", frame=frame, index=0)
     M.location[0] = fm_x_offset + m * travel
     M.keyframe_insert(data_path="location", frame=frame, index=0)
@@ -153,3 +165,11 @@ for keyframe in keyframes:
     Mgear.keyframe_insert(data_path="location", frame=frame, index=0)
     Mgear.rotation_euler.z = (not_a - b) * rotation_factor / 2
     Mgear.keyframe_insert(data_path="rotation_euler", frame=frame)
+    N.rotation_euler.z = m * rotation_factor
+    N.keyframe_insert(data_path="rotation_euler", frame=frame)
+    M.location[0] = fm_x_offset + m * travel
+    M.keyframe_insert(data_path="location", frame=frame, index=0)
+    P.location[0] = p_x_offset + p * travel
+    P.keyframe_insert(data_path="location", frame=frame, index=0)
+    Output4.location[0] = output4_x_offset + output4 * travel
+    Output4.keyframe_insert(data_path="location", frame=frame, index=0)
