@@ -1,7 +1,7 @@
 import bpy
 import math
 
-num_frames = 450
+num_frames = 500
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = num_frames
  
@@ -14,6 +14,7 @@ keyframes = [
         {'frame':150, 'a':0, 'b':1, 'c':0},
         {'frame':160, 'a':0, 'b':1, 'c':0},
         {'frame':200, 'a':0, 'b':0, 'c':0},
+        {'frame':210, 'a':0, 'b':0, 'c':0},
         {'frame':250, 'a':1, 'b':0, 'c':0},
         {'frame':260, 'a':1, 'b':0, 'c':0},
         {'frame':300, 'a':1, 'b':0, 'c':1},
@@ -22,12 +23,12 @@ keyframes = [
         {'frame':360, 'a':1, 'b':1, 'c':1},
         {'frame':400, 'a':1, 'b':1, 'c':0},
         {'frame':410, 'a':1, 'b':1, 'c':0},
-        {'frame':450, 'a':0, 'b':0, 'c':0}]
+        {'frame':450, 'a':1, 'b':0, 'c':0},
+        {'frame':460, 'a':1, 'b':0, 'c':0},
+        {'frame':500, 'a':0, 'b':0, 'c':0}]
         
 A = bpy.data.objects.get("A")
 A.animation_data_clear()
-B = bpy.data.objects.get("B")
-B.animation_data_clear()
 B = bpy.data.objects.get("B")
 B.animation_data_clear()
 C = bpy.data.objects.get("C")
@@ -68,11 +69,15 @@ K = bpy.data.objects.get("K")
 K.animation_data_clear()
 Output3 = bpy.data.objects.get("output3")
 Output3.animation_data_clear()
+M = bpy.data.objects.get("M")
+M.animation_data_clear()
+Mgear = bpy.data.objects.get("M_gear")
+Mgear.animation_data_clear()
 
 travel = 0.2  # how far the inputs move
 input_x_offset = 0.1
-f_x_offset = -0.135
-f_gear_x_offset = 0.16
+fm_x_offset = -0.135
+fm_gear_x_offset = 0.0425
 gh_x_offset = 0.0
 output12_x_offset = 0.43
 j_x_offset = 0.85  
@@ -88,12 +93,14 @@ for keyframe in keyframes:
     not_a = 1 - a
     not_b = 1 - b
     not_c = 1 - c
+    m = (b + not_a) / 2
     f = (c + not_b) / 2
     g = f * 2 - 1
     h = -g
     output1 = max(g, min(c, not_b))  # pulled back by c and not_b, pushed forward by g
     output2 = max(h, min(not_c, b))  # pulled back by not_c and b, pushed forward by h
     j = (output1 + output2) / 2
+    
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
     B.location[0] = input_x_offset + b * travel
@@ -112,9 +119,9 @@ for keyframe in keyframes:
     invertB.keyframe_insert(data_path="rotation_euler", frame=frame)
     invertC.rotation_euler.y = -c * rotation_factor
     invertC.keyframe_insert(data_path="rotation_euler", frame=frame)
-    F.location[0] = f_x_offset + f * travel
+    F.location[0] = fm_x_offset + f * travel
     F.keyframe_insert(data_path="location", frame=frame, index=0)
-    Fgear.location[0] = f_gear_x_offset + f * travel
+    Fgear.location[0] = fm_gear_x_offset + f * travel
     Fgear.keyframe_insert(data_path="location", frame=frame, index=0)
     Fgear.rotation_euler.z = (not_b - c) * rotation_factor / 2
     Fgear.keyframe_insert(data_path="rotation_euler", frame=frame)
@@ -140,3 +147,9 @@ for keyframe in keyframes:
     L.keyframe_insert(data_path="rotation_euler", frame=frame)
     Output3.location[0] = output3_x_offset + 2 * j * travel
     Output3.keyframe_insert(data_path="location", frame=frame, index=0)
+    M.location[0] = fm_x_offset + m * travel
+    M.keyframe_insert(data_path="location", frame=frame, index=0)
+    Mgear.location[0] = fm_gear_x_offset + m * travel
+    Mgear.keyframe_insert(data_path="location", frame=frame, index=0)
+    Mgear.rotation_euler.z = (not_a - b) * rotation_factor / 2
+    Mgear.keyframe_insert(data_path="rotation_euler", frame=frame)
