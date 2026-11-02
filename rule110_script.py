@@ -80,6 +80,8 @@ P = bpy.data.objects.get("P")
 P.animation_data_clear()
 Output4 = bpy.data.objects.get("output4")
 Output4.animation_data_clear()
+Q = bpy.data.objects.get("Q")
+Q.animation_data_clear()
 
 travel = 0.2  # how far the inputs move
 input_x_offset = 0.1
@@ -93,6 +95,7 @@ output3_x_offset = 0.85
 p_x_offset = -0.124
 rotation_factor = math.pi * 0.85  # radians per [0,1] distance travelled for meshing
 output4_x_offset = 0.193
+q_x_offset = 0.705
 
 for keyframe in keyframes:
     frame = keyframe['frame']
@@ -112,6 +115,7 @@ for keyframe in keyframes:
     j = (output1 + output2) / 2
     output3 = j * 2
     output4 = max(p, min(b, not_a))  # pulled back by b and not_a, pushed forward by p
+    q = (output3 + output4) / 2
     
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
@@ -153,7 +157,7 @@ for keyframe in keyframes:
     Jgear.keyframe_insert(data_path="location", frame=frame, index=0)
     Jgear.rotation_euler.y = (output2 - output1) * rotation_factor / 2
     Jgear.keyframe_insert(data_path="rotation_euler", frame=frame)
-    K.rotation_euler.y = j * rotation_factor
+    K.rotation_euler.y = -j * rotation_factor
     K.keyframe_insert(data_path="rotation_euler", frame=frame)
     L.rotation_euler.y = (g - h) * rotation_factor / 4
     L.keyframe_insert(data_path="rotation_euler", frame=frame)
@@ -173,3 +177,7 @@ for keyframe in keyframes:
     P.keyframe_insert(data_path="location", frame=frame, index=0)
     Output4.location[0] = output4_x_offset + output4 * travel
     Output4.keyframe_insert(data_path="location", frame=frame, index=0)
+    Q.location[0] = q_x_offset + q * travel
+    Q.keyframe_insert(data_path="location", frame=frame, index=0)
+    Q.rotation_euler.y = (output4 - output3) * rotation_factor / 2
+    Q.keyframe_insert(data_path="rotation_euler", frame=frame)
