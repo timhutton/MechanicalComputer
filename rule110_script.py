@@ -1,7 +1,7 @@
 import bpy
 import math
 
-num_frames = 201
+num_frames = 450
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = num_frames
  
@@ -13,16 +13,33 @@ keyframes = [
         {'frame':110, 'a':0, 'b':1, 'c':1},
         {'frame':150, 'a':0, 'b':1, 'c':0},
         {'frame':160, 'a':0, 'b':1, 'c':0},
-        {'frame':200, 'a':0, 'b':0, 'c':0}]
+        {'frame':200, 'a':0, 'b':0, 'c':0},
+        {'frame':250, 'a':1, 'b':0, 'c':0},
+        {'frame':260, 'a':1, 'b':0, 'c':0},
+        {'frame':300, 'a':1, 'b':0, 'c':1},
+        {'frame':310, 'a':1, 'b':0, 'c':1},
+        {'frame':350, 'a':1, 'b':1, 'c':1},
+        {'frame':360, 'a':1, 'b':1, 'c':1},
+        {'frame':400, 'a':1, 'b':1, 'c':0},
+        {'frame':410, 'a':1, 'b':1, 'c':0},
+        {'frame':450, 'a':0, 'b':0, 'c':0}]
         
+A = bpy.data.objects.get("A")
+A.animation_data_clear()
+B = bpy.data.objects.get("B")
+B.animation_data_clear()
 B = bpy.data.objects.get("B")
 B.animation_data_clear()
 C = bpy.data.objects.get("C")
 C.animation_data_clear()
+notA = bpy.data.objects.get("not_A")
+notA.animation_data_clear()
 notB = bpy.data.objects.get("not_B")
 notB.animation_data_clear()
 notC = bpy.data.objects.get("not_C")
 notC.animation_data_clear()
+invertA = bpy.data.objects.get("invert_A")
+invertA.animation_data_clear()
 invertB = bpy.data.objects.get("invert_B")
 invertB.animation_data_clear()
 invertC = bpy.data.objects.get("invert_C")
@@ -65,8 +82,10 @@ rotation_factor = math.pi * 0.85  # radians per [0,1] distance travelled for mes
 
 for keyframe in keyframes:
     frame = keyframe['frame']
+    a = keyframe['a']
     b = keyframe['b']
     c = keyframe['c']
+    not_a = 1 - a
     not_b = 1 - b
     not_c = 1 - c
     f = (c + not_b) / 2
@@ -75,14 +94,20 @@ for keyframe in keyframes:
     output1 = max(g, min(c, not_b))  # pulled back by c and not_b, pushed forward by g
     output2 = max(h, min(not_c, b))  # pulled back by not_c and b, pushed forward by h
     j = (output1 + output2) / 2
+    A.location[0] = input_x_offset + a * travel
+    A.keyframe_insert(data_path="location", frame=frame, index=0)
     B.location[0] = input_x_offset + b * travel
     B.keyframe_insert(data_path="location", frame=frame, index=0)
     C.location[0] = input_x_offset + c * travel
     C.keyframe_insert(data_path="location", frame=frame, index=0)
+    notA.location[0] = input_x_offset + not_a * travel
+    notA.keyframe_insert(data_path="location", frame=frame, index=0)
     notB.location[0] = input_x_offset + not_b * travel
     notB.keyframe_insert(data_path="location", frame=frame, index=0)
     notC.location[0] = input_x_offset + not_c * travel
     notC.keyframe_insert(data_path="location", frame=frame, index=0)
+    invertA.rotation_euler.y = -a * rotation_factor
+    invertA.keyframe_insert(data_path="rotation_euler", frame=frame)
     invertB.rotation_euler.y = b * rotation_factor
     invertB.keyframe_insert(data_path="rotation_euler", frame=frame)
     invertC.rotation_euler.y = -c * rotation_factor
