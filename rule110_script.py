@@ -1,33 +1,6 @@
 import bpy
 import math
 
-num_frames = 500
-bpy.data.scenes[0].frame_start = 0
-bpy.data.scenes[0].frame_end = num_frames
- 
-keyframes = [
-        {'frame':0, 'a':0, 'b':0, 'c':0}, 
-        {'frame':10, 'a':0, 'b':0, 'c':0}, 
-        {'frame':50, 'a':0, 'b':0, 'c':1},
-        {'frame':60, 'a':0, 'b':0, 'c':1},
-        {'frame':100, 'a':0, 'b':1, 'c':1},
-        {'frame':110, 'a':0, 'b':1, 'c':1},
-        {'frame':150, 'a':0, 'b':1, 'c':0},
-        {'frame':160, 'a':0, 'b':1, 'c':0},
-        {'frame':200, 'a':0, 'b':0, 'c':0},
-        {'frame':210, 'a':0, 'b':0, 'c':0},
-        {'frame':250, 'a':1, 'b':0, 'c':0},
-        {'frame':260, 'a':1, 'b':0, 'c':0},
-        {'frame':300, 'a':1, 'b':0, 'c':1},
-        {'frame':310, 'a':1, 'b':0, 'c':1},
-        {'frame':350, 'a':1, 'b':1, 'c':1},
-        {'frame':360, 'a':1, 'b':1, 'c':1},
-        {'frame':400, 'a':1, 'b':1, 'c':0},
-        {'frame':410, 'a':1, 'b':1, 'c':0},
-        {'frame':450, 'a':1, 'b':0, 'c':0},
-        {'frame':460, 'a':1, 'b':0, 'c':0},
-        {'frame':500, 'a':0, 'b':0, 'c':0}]
-        
 A = bpy.data.objects.get("A")
 A.animation_data_clear()
 B = bpy.data.objects.get("B")
@@ -107,11 +80,7 @@ q_x_offset = 0.705
 t_x_offset = 0.695
 output5_x_offset = 1.16
 
-for keyframe in keyframes:
-    frame = keyframe['frame']
-    a = keyframe['a']
-    b = keyframe['b']
-    c = keyframe['c']
+def set_state(a, b, c, frame):
     not_a = 1 - a
     not_b = 1 - b
     not_c = 1 - c
@@ -201,3 +170,38 @@ for keyframe in keyframes:
     T.keyframe_insert(data_path="location", frame=frame, index=0)
     Output5.location[0] = output5_x_offset + output5 * travel
     Output5.keyframe_insert(data_path="location", frame=frame, index=0)
+
+num_frames = 500
+bpy.data.scenes[0].frame_start = 0
+bpy.data.scenes[0].frame_end = num_frames
+ 
+keyframes = [
+        {'frame':0, 'a':0, 'b':0, 'c':0}, 
+        {'frame':10, 'a':0, 'b':0, 'c':0}, 
+        {'frame':50, 'a':0, 'b':0, 'c':1},
+        {'frame':60, 'a':0, 'b':0, 'c':1},
+        {'frame':100, 'a':0, 'b':1, 'c':1},
+        {'frame':110, 'a':0, 'b':1, 'c':1},
+        {'frame':150, 'a':0, 'b':1, 'c':0},
+        {'frame':160, 'a':0, 'b':1, 'c':0},
+        {'frame':200, 'a':0, 'b':0, 'c':0},
+        {'frame':210, 'a':0, 'b':0, 'c':0},
+        {'frame':250, 'a':1, 'b':0, 'c':0},
+        {'frame':260, 'a':1, 'b':0, 'c':0},
+        {'frame':300, 'a':1, 'b':0, 'c':1},
+        {'frame':310, 'a':1, 'b':0, 'c':1},
+        {'frame':350, 'a':1, 'b':1, 'c':1},
+        {'frame':360, 'a':1, 'b':1, 'c':1},
+        {'frame':400, 'a':1, 'b':1, 'c':0},
+        {'frame':410, 'a':1, 'b':1, 'c':0},
+        {'frame':450, 'a':1, 'b':0, 'c':0},
+        {'frame':460, 'a':1, 'b':0, 'c':0},
+        {'frame':500, 'a':0, 'b':0, 'c':0}]
+        
+for keyframe in keyframes:
+    frame = keyframe['frame']
+    a = keyframe['a']
+    b = keyframe['b']
+    c = keyframe['c']
+    set_state(a, b, c, frame)
+    
