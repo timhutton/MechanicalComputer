@@ -82,6 +82,10 @@ Output4 = bpy.data.objects.get("output4")
 Output4.animation_data_clear()
 Q = bpy.data.objects.get("Q")
 Q.animation_data_clear()
+R = bpy.data.objects.get("R")
+R.animation_data_clear()
+S = bpy.data.objects.get("S")
+S.animation_data_clear()
 
 travel = 0.2  # how far the inputs move
 input_x_offset = 0.1
@@ -181,3 +185,8 @@ for keyframe in keyframes:
     Q.keyframe_insert(data_path="location", frame=frame, index=0)
     Q.rotation_euler.y = (output4 - output3) * rotation_factor / 2
     Q.keyframe_insert(data_path="rotation_euler", frame=frame)
+    R.location[0] = j_x_offset + q * travel
+    R.keyframe_insert(data_path="location", frame=frame, index=0)
+    S.rotation_euler.y = -q * rotation_factor / 2
+    S.keyframe_insert(data_path="rotation_euler", frame=frame)
+ 
