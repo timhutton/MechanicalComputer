@@ -216,6 +216,8 @@ def demo_3bit_cycle():
 
     bpy.data.scenes[0].frame_start = 0
     bpy.data.scenes[0].frame_end = frame - 1
+    # update the scene to the current frame
+    bpy.context.scene.frame_set(bpy.context.scene.frame_current)
 
 
 def set_input_pegs(peg_values):
@@ -226,7 +228,28 @@ def set_input_pegs(peg_values):
         peg = bpy.data.objects.get(f"Peg.{peg_idx:03d}")
         peg.animation_data_clear()
         peg.location[0] = track_zero + (track_one - track_zero) * peg_value
-        
+
+
+def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
+    """peg_start and peg_end are indices of the peg to be at SensorB"""
+    num_frames = abs(end_peg_idx - start_peg_idx) * frames_per_peg
+    bpy.data.scenes[0].frame_start = 0
+    bpy.data.scenes[0].frame_end = num_frames - 1
+    start_peg = bpy.data.objects.get(f"Peg.{start_peg_idx:03d}")
+    end_peg = bpy.data.objects.get(f"Peg.{end_peg_idx:03d}")
+    # animate the carriage movement
+    carriage = bpy.data.objects.get("Carriage")
+    carriage.animation_data_clear()
+    sensorB = bpy.data.objects.get("SensorB")
+    sensorB.animation_data_clear()
+    carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
+    for frame in range(num_frames):
+        carriage.location[1] = carriage_offset + start_peg.matrix_world.translation[1] + (end_peg.matrix_world.translation[1] - start_peg.matrix_world.translation[1]) * frame / (num_frames - 1)
+        carriage.keyframe_insert(data_path="location", frame=frame, index=1)
+    # finally update the scene to the current frame
+    bpy.context.scene.frame_set(bpy.context.scene.frame_current)
+
 
 set_input_pegs([0,1]*(num_pegs//2))
 #demo_3bit_cycle()
+animate_carriage(42, 48, frames_per_peg = 60)
