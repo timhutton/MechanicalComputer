@@ -65,7 +65,10 @@ T.animation_data_clear()
 Output5 = bpy.data.objects.get("output5")
 Output5.animation_data_clear()
 
-# initialize the rods that are undefined during some transitions
+# rod positions that have hysteresis
+a = 0
+b = 0
+c = 0
 output1 = 0
 output2 = 0
 output3 = 0  # (this one doesn't need to be global)
@@ -73,6 +76,7 @@ output4 = 0
 output5 = 0
 
 num_pegs = 94
+pegs = [bpy.data.objects.get(f"Peg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
 
 
 def set_state(a, b, c, frame):
@@ -222,12 +226,35 @@ def demo_3bit_cycle():
 
 def set_input_pegs(peg_values):
     # move each input peg to a [0,1] position
-    track_zero = bpy.data.objects.get("TrackZero").location[0]
-    track_one = bpy.data.objects.get("TrackOne").location[0]
+    track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
+    track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
     for peg_idx, peg_value in enumerate(peg_values):
         peg = bpy.data.objects.get(f"Peg.{peg_idx:03d}")
         peg.animation_data_clear()
         peg.location[0] = track_zero + (track_one - track_zero) * peg_value
+
+
+def get_closest_peg(y_coordinate):
+    return min(pegs, key = lambda peg: abs(peg.matrix_world.translation[1] - y_coordinate))
+    
+
+def set_carriage_state_from_input_pegs(frame):
+    """Given the current position of the carriage and the input pegs, set the internal carriage state to match."""
+    global a, b, c  # the inputs before the carriage moved to this position (hysteresis)
+    bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
+    track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
+    track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
+    # set the inputs based on the closest pegs (TODO: animate pushing properly)
+    sensorA_y_coordinate = bpy.data.objects.get("SensorA").matrix_world.translation[1]
+    sensorB_y_coordinate = bpy.data.objects.get("SensorB").matrix_world.translation[1]
+    sensorC_y_coordinate = bpy.data.objects.get("SensorC").matrix_world.translation[1]
+    pegA_x_coordinate = get_closest_peg(sensorA_y_coordinate).matrix_world.translation[0]
+    pegB_x_coordinate = get_closest_peg(sensorB_y_coordinate).matrix_world.translation[0]
+    pegC_x_coordinate = get_closest_peg(sensorC_y_coordinate).matrix_world.translation[0]
+    a = (pegA_x_coordinate - track_zero) / (track_one - track_zero)
+    b = (pegB_x_coordinate - track_zero) / (track_one - track_zero)
+    c = (pegC_x_coordinate - track_zero) / (track_one - track_zero)
+    set_state(a, b, c, frame)
 
 
 def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
@@ -246,10 +273,11 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     for frame in range(num_frames):
         carriage.location[1] = carriage_offset + start_peg.matrix_world.translation[1] + (end_peg.matrix_world.translation[1] - start_peg.matrix_world.translation[1]) * frame / (num_frames - 1)
         carriage.keyframe_insert(data_path="location", frame=frame, index=1)
+        set_carriage_state_from_input_pegs(frame)
     # finally update the scene to the current frame
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
 
 
-set_input_pegs([0,1]*(num_pegs//2))
+set_input_pegs([0,0,1]*(num_pegs//3))
 #demo_3bit_cycle()
-animate_carriage(42, 48, frames_per_peg = 60)
+animate_carriage(43, 48, frames_per_peg = 20)
