@@ -80,7 +80,15 @@ q_x_offset = 0.705
 t_x_offset = 0.695
 output5_x_offset = 1.16
 
+# initialize the rods that are undefined during some transitions
+output1 = 0
+output2 = 0
+output3 = 0
+output4 = 0
+output5 = 0
+
 def set_state(a, b, c, frame):
+    global output1, output2, output3, output4, output5
     not_a = 1 - a
     not_b = 1 - b
     not_c = 1 - c
@@ -89,14 +97,18 @@ def set_state(a, b, c, frame):
     g = f * 2 - 1
     h = -g
     p = m * 2 - 1
-    output1 = max(g, min(c, not_b))  # pulled back by c and not_b, pushed forward by g
-    output2 = max(h, min(not_c, b))  # pulled back by not_c and b, pushed forward by h
+    output1 = max(g, output1)  # pushed forward by g
+    output1 = min(min(c, not_b), output1)  # pulled back by c and not_b
+    output2 = max(h, output2)  # pushed forward by h
+    output2 = min(min(not_c, b), output2)  # pulled back by not_c and b
     j = (output1 + output2) / 2
     output3 = j * 2
-    output4 = max(p, min(b, not_a))  # pulled back by b and not_a, pushed forward by p
+    output4 = max(p, output4)  # pushed forward by p
+    output4 = min(min(b, not_a), output4)  # pulled back by b and not_a
     q = (output3 + output4) / 2
     t = q * 2
-    output5 = min(t, max(output3, output4))  # pushed forward by output3 and ouput4, pulled back by t
+    output5 = min(t, output5)  # pulled back by t
+    output5 = max(max(output3, output4), output5)  # pushed forward by output3 and ouput4
     
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
@@ -185,12 +197,12 @@ for inputs in inputs_bin:
     for i in range(transition_frames):
         u = i / float(transition_frames-1)
         values = [int(old_inputs[j]) * (1-u) + int(inputs[j]) * u for j in range(3)]
-        set_state(a=values[0], b=values[1], c=values[2], frame=frame)
+        set_state(*values, frame)
         frame += 1
     # a period of stasis
+    values = [int(inputs[j]) for j in range(3)]
     for i in range(static_frames):
-        values = [int(inputs[j]) for j in range(3)]
-        set_state(a=values[0], b=values[1], c=values[2], frame=frame)
+        set_state(*values, frame)
         frame += 1
     old_inputs = inputs
 
