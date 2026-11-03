@@ -86,6 +86,10 @@ R = bpy.data.objects.get("R")
 R.animation_data_clear()
 S = bpy.data.objects.get("S")
 S.animation_data_clear()
+T = bpy.data.objects.get("T")
+T.animation_data_clear()
+Output5 = bpy.data.objects.get("output5")
+Output5.animation_data_clear()
 
 travel = 0.2  # how far the inputs move
 input_x_offset = 0.1
@@ -100,6 +104,8 @@ p_x_offset = -0.124
 rotation_factor = math.pi * 0.85  # radians per [0,1] distance travelled for meshing
 output4_x_offset = 0.193
 q_x_offset = 0.705
+t_x_offset = 0.695
+output5_x_offset = 1.16
 
 for keyframe in keyframes:
     frame = keyframe['frame']
@@ -120,6 +126,8 @@ for keyframe in keyframes:
     output3 = j * 2
     output4 = max(p, min(b, not_a))  # pulled back by b and not_a, pushed forward by p
     q = (output3 + output4) / 2
+    t = q * 2
+    output5 = min(t, max(output3, output4))  # pushed forward by output3 and ouput4, pulled back by t
     
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
@@ -187,6 +195,9 @@ for keyframe in keyframes:
     Q.keyframe_insert(data_path="rotation_euler", frame=frame)
     R.location[0] = j_x_offset + q * travel
     R.keyframe_insert(data_path="location", frame=frame, index=0)
-    S.rotation_euler.y = -q * rotation_factor / 2
+    S.rotation_euler.y = -q * rotation_factor
     S.keyframe_insert(data_path="rotation_euler", frame=frame)
- 
+    T.location[0] = t_x_offset + t * travel
+    T.keyframe_insert(data_path="location", frame=frame, index=0)
+    Output5.location[0] = output5_x_offset + output5 * travel
+    Output5.keyframe_insert(data_path="location", frame=frame, index=0)
