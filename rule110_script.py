@@ -187,8 +187,8 @@ def set_state(a, b, c, frame):
 inputs_int = [0,1,2,3,4,5,6,7,0]
 inputs_bin = [format(v,'03b') for v in inputs_int]
 
-transition_frames = 60
-static_frames = 30
+transition_frames = 40
+static_frames = 10
 
 frame = 0
 old_inputs = '000'
