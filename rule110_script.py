@@ -77,6 +77,7 @@ output5 = 0
 
 num_pegs = 94
 pegs = [bpy.data.objects.get(f"Peg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
+peg_radius = 0.95
 
 
 def set_state(a, b, c, frame):
@@ -235,6 +236,7 @@ def set_input_pegs(peg_values):
 
 
 def get_closest_peg(y_coordinate):
+    """Returns the blender object for the peg that is closest to the supplied y-coordinate."""
     return min(pegs, key = lambda peg: abs(peg.matrix_world.translation[1] - y_coordinate))
     
 
@@ -278,6 +280,8 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
 
 
-set_input_pegs([0,0,1]*(num_pegs//3))
+peg_values = [0] * num_pegs
+peg_values[46] = 1
+set_input_pegs(peg_values)
 #demo_3bit_cycle()
-animate_carriage(43, 48, frames_per_peg = 20)
+animate_carriage(42, 50, frames_per_peg = 20)
