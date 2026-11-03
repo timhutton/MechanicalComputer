@@ -171,37 +171,29 @@ def set_state(a, b, c, frame):
     Output5.location[0] = output5_x_offset + output5 * travel
     Output5.keyframe_insert(data_path="location", frame=frame, index=0)
 
-num_frames = 500
+# iterate through inputs abc: 000, 001, 010, ... , 110, 111, 000
+inputs_int = [0,1,2,3,4,5,6,7,0]
+inputs_bin = [format(v,'03b') for v in inputs_int]
+
+transition_frames = 60
+static_frames = 30
+
+frame = 0
+old_inputs = '000'
+for inputs in inputs_bin:
+    # transition to the new input values
+    for i in range(transition_frames):
+        u = i / float(transition_frames-1)
+        values = [int(old_inputs[j]) * (1-u) + int(inputs[j]) * u for j in range(3)]
+        set_state(a=values[0], b=values[1], c=values[2], frame=frame)
+        frame += 1
+    # a period of stasis
+    for i in range(static_frames):
+        values = [int(inputs[j]) for j in range(3)]
+        set_state(a=values[0], b=values[1], c=values[2], frame=frame)
+        frame += 1
+    old_inputs = inputs
+
 bpy.data.scenes[0].frame_start = 0
-bpy.data.scenes[0].frame_end = num_frames
- 
-keyframes = [
-        {'frame':0, 'a':0, 'b':0, 'c':0}, 
-        {'frame':10, 'a':0, 'b':0, 'c':0}, 
-        {'frame':50, 'a':0, 'b':0, 'c':1},
-        {'frame':60, 'a':0, 'b':0, 'c':1},
-        {'frame':100, 'a':0, 'b':1, 'c':1},
-        {'frame':110, 'a':0, 'b':1, 'c':1},
-        {'frame':150, 'a':0, 'b':1, 'c':0},
-        {'frame':160, 'a':0, 'b':1, 'c':0},
-        {'frame':200, 'a':0, 'b':0, 'c':0},
-        {'frame':210, 'a':0, 'b':0, 'c':0},
-        {'frame':250, 'a':1, 'b':0, 'c':0},
-        {'frame':260, 'a':1, 'b':0, 'c':0},
-        {'frame':300, 'a':1, 'b':0, 'c':1},
-        {'frame':310, 'a':1, 'b':0, 'c':1},
-        {'frame':350, 'a':1, 'b':1, 'c':1},
-        {'frame':360, 'a':1, 'b':1, 'c':1},
-        {'frame':400, 'a':1, 'b':1, 'c':0},
-        {'frame':410, 'a':1, 'b':1, 'c':0},
-        {'frame':450, 'a':1, 'b':0, 'c':0},
-        {'frame':460, 'a':1, 'b':0, 'c':0},
-        {'frame':500, 'a':0, 'b':0, 'c':0}]
-        
-for keyframe in keyframes:
-    frame = keyframe['frame']
-    a = keyframe['a']
-    b = keyframe['b']
-    c = keyframe['c']
-    set_state(a, b, c, frame)
-    
+bpy.data.scenes[0].frame_end = frame - 1
+
