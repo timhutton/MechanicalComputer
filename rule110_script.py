@@ -256,10 +256,11 @@ def get_new_input_position(peg, sensor):
     peg_pos = np.array(peg.matrix_world.translation)
     # TODO: just a simple technique for now, couldn't get pretend physics to work
     value = sensor_x_to_value(sensor_pos[0])
+    max_speed = 0.1  # TODO:  2 / frames_per_peg maybe?
     if peg_pos[0] > sensor_pos[0]:
-        return max(value - 0.1, 0)
+        return max(value - max_speed, 0)
     else:
-        return min(value + 0.1, 1)
+        return min(value + max_speed, 1)
     # iteratively tweak sensor_pos until no more overlap
     # (an analytic solution certainly exists but it was too hard to work out)
     print(f"sensor_pos = {sensor_pos}  peg_pos = {peg_pos}")
