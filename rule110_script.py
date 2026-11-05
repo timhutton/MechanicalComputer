@@ -1,5 +1,7 @@
 import bpy
 import math
+import numpy as np
+import os
 
 # access the objects we will be moving
 A = bpy.data.objects.get("A")
@@ -71,19 +73,21 @@ b = 0
 c = 0
 output1 = 0
 output2 = 0
-output3 = 0  # (this one doesn't need to be global)
 output4 = 0
 output5 = 0
 
 num_pegs = 94
 pegs = [bpy.data.objects.get(f"Peg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
-peg_radius = 0.95
+peg_radius = 0.095
+travel = 0.2  # how far the inputs move
+sensor_square_radius = travel / math.sqrt(2)  # distance from diamond center to edge midpoint
+
+track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
+track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
 
 
 def set_state(a, b, c, frame):
-    global output1, output2, output3, output4, output5
-
-    travel = 0.2  # how far the inputs move
+    global output1, output2, output4, output5
 
     input_x_offset = 0.1
     fm_x_offset = -0.135
@@ -226,9 +230,7 @@ def demo_3bit_cycle():
 
 
 def set_input_pegs(peg_values):
-    # move each input peg to a [0,1] position
-    track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
-    track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
+    """Move each input peg to a [0,1] position."""
     for peg_idx, peg_value in enumerate(peg_values):
         peg = bpy.data.objects.get(f"Peg.{peg_idx:03d}")
         peg.animation_data_clear()
@@ -238,30 +240,67 @@ def set_input_pegs(peg_values):
 def get_closest_peg(y_coordinate):
     """Returns the blender object for the peg that is closest to the supplied y-coordinate."""
     return min(pegs, key = lambda peg: abs(peg.matrix_world.translation[1] - y_coordinate))
-    
+
+
+def get_new_input_position(peg, sensor):
+    "The carriage has moved sideways, what should this input rods new position be?"""
+    bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
+    sensor_pos = np.array(sensor.matrix_world.translation)
+    peg_pos = np.array(peg.matrix_world.translation)
+    new_value = 0
+    # iteratively tweak sensor_pos until no more overlap
+    # (an analytic solution certainly exists but it was too hard to work out)
+    print(f"sensor_pos = {sensor_pos}  peg_pos = {peg_pos}")
+    while True:
+        # vector from sensor center to peg center
+        v = peg_pos - sensor_pos
+        v[2] = 0
+        # rotate 45 degrees around the z-axis so that the sensor is now axis-aligned (and ignore z-coordinate)
+        rotated_peg_pos = np.array([math.sqrt(2) * (v[0] - v[1]) / 2, math.sqrt(2) * (v[0] + v[1]) / 2, 0])
+        # clamp to lie in/on the sensor
+        p = np.clip(rotated_peg_pos, -sensor_square_radius, sensor_square_radius)
+        # test if this point is inside the peg
+        d = np.linalg.norm(p - rotated_peg_pos)
+        print(f"v = {v}  p = {p}  rotated_peg_pos = {rotated_peg_pos}  d = {d}  peg_radius = {peg_radius}  sensor_square_radius = {sensor_square_radius}\n")
+        if d > peg_radius:
+            print("sensor not touching peg")
+            break  # sensor does not overlap peg and more, we are done
+        if peg_pos[0] > sensor_pos[0]:
+            sensor_pos[0] -= peg_radius / 10
+        if peg_pos[0] < sensor_pos[0]:  
+            sensor_pos[0] += peg_radius / 10
+        new_value = (sensor_pos[0] - track_zero) / (track_one - track_zero)
+        print(f"Moved sensor. sensor_pos = {sensor_pos}  new_value = {new_value}")
+        #print(f"DEBUG")
+        #raise KeyboardInterrupt()
+        if new_value < 0 or new_value > 1:
+            new_value = np.clip(new_value, 0, 1)
+            print("WAENING: sensor was pushed off the track!")
+            break
+    return new_value
+
 
 def set_carriage_state_from_input_pegs(frame):
     """Given the current position of the carriage and the input pegs, set the internal carriage state to match."""
     global a, b, c  # the inputs before the carriage moved to this position (hysteresis)
-    bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
-    track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
-    track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
     # set the inputs based on the closest pegs (TODO: animate pushing properly)
-    sensorA_y_coordinate = bpy.data.objects.get("SensorA").matrix_world.translation[1]
-    sensorB_y_coordinate = bpy.data.objects.get("SensorB").matrix_world.translation[1]
-    sensorC_y_coordinate = bpy.data.objects.get("SensorC").matrix_world.translation[1]
-    pegA_x_coordinate = get_closest_peg(sensorA_y_coordinate).matrix_world.translation[0]
-    pegB_x_coordinate = get_closest_peg(sensorB_y_coordinate).matrix_world.translation[0]
-    pegC_x_coordinate = get_closest_peg(sensorC_y_coordinate).matrix_world.translation[0]
-    a = (pegA_x_coordinate - track_zero) / (track_one - track_zero)
-    b = (pegB_x_coordinate - track_zero) / (track_one - track_zero)
-    c = (pegC_x_coordinate - track_zero) / (track_one - track_zero)
+    bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
+    sensorA = bpy.data.objects.get("SensorA")
+    sensorB = bpy.data.objects.get("SensorB")
+    sensorC = bpy.data.objects.get("SensorC")
+    pegA = get_closest_peg(sensorA.matrix_world.translation[1])
+    pegB = get_closest_peg(sensorB.matrix_world.translation[1])
+    pegC = get_closest_peg(sensorC.matrix_world.translation[1])
+    #a = get_new_input_position(pegA, sensorA)
+    #b = get_new_input_position(pegB, sensorB)
+    print("Adjusting sensor C")
+    c = get_new_input_position(pegC, sensorC)
     set_state(a, b, c, frame)
 
 
 def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     """peg_start and peg_end are indices of the peg to be at SensorB"""
-    num_frames = abs(end_peg_idx - start_peg_idx) * frames_per_peg
+    num_frames = abs(end_peg_idx - start_peg_idx + 1) * frames_per_peg
     bpy.data.scenes[0].frame_start = 0
     bpy.data.scenes[0].frame_end = num_frames - 1
     start_peg = bpy.data.objects.get(f"Peg.{start_peg_idx:03d}")
@@ -272,16 +311,20 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     sensorB = bpy.data.objects.get("SensorB")
     sensorB.animation_data_clear()
     carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
+    a = b = c = 0
+    set_state(a, b, c, 0)
     for frame in range(num_frames):
         carriage.location[1] = carriage_offset + start_peg.matrix_world.translation[1] + (end_peg.matrix_world.translation[1] - start_peg.matrix_world.translation[1]) * frame / (num_frames - 1)
         carriage.keyframe_insert(data_path="location", frame=frame, index=1)
         set_carriage_state_from_input_pegs(frame)
     # finally update the scene to the current frame
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
+    print("Done")
 
 
+os.system("cls")
 peg_values = [0] * num_pegs
 peg_values[46] = 1
 set_input_pegs(peg_values)
 #demo_3bit_cycle()
-animate_carriage(42, 50, frames_per_peg = 20)
+animate_carriage(45, 46, frames_per_peg = 1)
