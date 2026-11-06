@@ -253,7 +253,7 @@ def sensor_x_to_value(x):
     # track_zero and track_one are their centers, and there's a middle track.
     one_x = track_zero - travel / 2  # sensor = 1  => sensor is at track zero
     zero_x = track_one + travel / 2  # sensor = 0  => sensor is at track one
-    print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
+    # print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
     return (x - zero_x) / (one_x - zero_x)
 
 def get_new_input_position(peg, sensor):
@@ -315,12 +315,12 @@ def set_carriage_state_from_input_pegs(frame):
     pegC = get_closest_peg(sensorC.matrix_world.translation[1])
     a = get_new_input_position(pegA, sensorA)
     b = get_new_input_position(pegB, sensorB)
-    print("Adjusting sensor C")
+    # print("Adjusting sensor C")
     c = get_new_input_position(pegC, sensorC)
-    print(f"Setting state for c = {c}")
+    # print(f"Setting state for c = {c}")
     set_state(a, b, c, frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
-    print(f"After setting state got sensorC.matrix_world.translation[0] == {sensorC.matrix_world.translation[0]}")
+    # print(f"After setting state got sensorC.matrix_world.translation[0] == {sensorC.matrix_world.translation[0]}")
 
 
 def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
@@ -340,7 +340,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     set_state(a, b, c, 0)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     for frame in range(num_frames):
-        print("\nSetting inputs for new carriage position.\n")
+        # print("\nSetting inputs for new carriage position.\n")
         carriage.location[1] = carriage_offset + start_peg.matrix_world.translation[1] + (end_peg.matrix_world.translation[1] - start_peg.matrix_world.translation[1]) * frame / (num_frames - 1)
         carriage.keyframe_insert(data_path="location", frame=frame, index=1)
         set_carriage_state_from_input_pegs(frame)
@@ -354,5 +354,4 @@ peg_values = [0] * num_pegs
 peg_values[46] = 1
 set_input_pegs(peg_values)
 #demo_3bit_cycle() 
-animate_carriage(43, 49, frames_per_peg = 50)
- 
+animate_carriage(41, 49, frames_per_peg = 50)
