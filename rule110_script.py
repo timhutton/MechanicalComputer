@@ -205,9 +205,9 @@ def set_state(a, b, c, left, right, frame):
     T.keyframe_insert(data_path="location", frame=frame, index=0)
     Output5.location[0] = output5_x_offset + output5 * travel
     Output5.keyframe_insert(data_path="location", frame=frame, index=0)
-    UpdaterLeft.location[0] = updater_x_offset + left * travel
+    UpdaterLeft.location[0] = updater_x_offset - left * travel
     UpdaterLeft.keyframe_insert(data_path="location", frame=frame, index=0)
-    UpdaterRight.location[0] = updater_x_offset + right * travel
+    UpdaterRight.location[0] = updater_x_offset - right * travel
     UpdaterRight.keyframe_insert(data_path="location", frame=frame, index=0)
 
 
@@ -264,26 +264,33 @@ def get_closest_temp_peg(y_coordinate):
     return min(temp_pegs, key = lambda peg: abs(peg.matrix_world.translation[1] - y_coordinate))
 
 
-def sensor_x_to_value(x):
+def sensor_x_to_value(x, is_temp=False):
     """Given a sensor's x-coordinate, what [0,1] is the input position?"""
-    # track_zero and track_one are their centers, and there's a middle track.
-    one_x = track_zero - travel / 2  # sensor = 1  => sensor is at track zero
-    zero_x = track_one + travel / 2  # sensor = 0  => sensor is at track one
-    # print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
-    return (x - zero_x) / (one_x - zero_x)
+    if is_temp:
+        # track_zero and track_one are their centers, and there's a middle track.
+        one_x = temp_zero - travel / 2  # sensor = 1  => sensor is at track zero
+        zero_x = temp_one + travel / 2  # sensor = 0  => sensor is at track one
+        # print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
+        return (x - zero_x) / (one_x - zero_x)
+    else:
+        # track_zero and track_one are their centers, and there's a middle track.
+        one_x = track_zero - travel / 2  # sensor = 1  => sensor is at track zero
+        zero_x = track_one + travel / 2  # sensor = 0  => sensor is at track one
+        # print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
+        return (x - zero_x) / (one_x - zero_x)
 
-def get_new_input_position(peg, sensor, frames_per_peg):
+def get_new_input_position(peg, sensor, frames_per_peg, is_temp=False):
     "The carriage has moved sideways, what should this input rods new position be?"""
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     sensor_pos = np.array(sensor.matrix_world.translation)
     peg_pos = np.array(peg.matrix_world.translation)
     # TODO: just a simple technique for now, couldn't get pretend physics to work
-    value = sensor_x_to_value(sensor_pos[0])
-    max_speed = 2 / frames_per_peg
+    #new_ = sensor_x_to_value(sensor_pos[0], is_temp)
+    max_speed = 2 * travel / frames_per_peg
     if peg_pos[0] > sensor_pos[0]:
-        return max(value - max_speed, 0)
+        return min(1, max(0, sensor_x_to_value(sensor_pos[0] - max_speed, is_temp)))
     else:
-        return min(value + max_speed, 1)
+        return min(1, max(0, sensor_x_to_value(sensor_pos[0] + max_speed, is_temp)))
     # iteratively tweak sensor_pos until no more overlap
     # (an analytic solution certainly exists but it was too hard to work out)
     print(f"sensor_pos = {sensor_pos}  peg_pos = {peg_pos}")
@@ -336,8 +343,9 @@ def set_carriage_state_from_input_pegs(frame, frames_per_peg):
     a = get_new_input_position(pegA, sensorA, frames_per_peg)
     b = get_new_input_position(pegB, sensorB, frames_per_peg)
     c = get_new_input_position(pegC, sensorC, frames_per_peg)
-    left = get_new_input_position(pegLeft, sensorLeft, frames_per_peg)
-    right = get_new_input_position(pegRight, sensorRight, frames_per_peg)
+    left = get_new_input_position(pegLeft, sensorLeft, frames_per_peg, True)
+    right = get_new_input_position(pegRight, sensorRight, frames_per_peg, True)
+    #print(f"Would set left = {left}, right = {right}")
     set_state(a, b, c, left, right, frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     # print(f"After setting state got sensorC.matrix_world.translation[0] == {sensorC.matrix_world.translation[0]}")
@@ -357,7 +365,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     sensorB.animation_data_clear()
     carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
     a = b = c = 0
-    left = right = 0.5 
+    left = right = 0 
     set_state(a, b, c, left, right, 0)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     for frame in range(num_frames):
