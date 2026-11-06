@@ -82,6 +82,7 @@ output5 = 0
 
 num_pegs = 94
 pegs = [bpy.data.objects.get(f"Peg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
+temp_pegs = [bpy.data.objects.get(f"TempPeg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
 peg_radius = 0.095
 travel = 0.2  # how far the inputs move
 sensor_square_radius = travel / math.sqrt(2)  # distance from diamond center to edge midpoint
@@ -257,6 +258,12 @@ def get_closest_peg(y_coordinate):
     """Returns the blender object for the peg that is closest to the supplied y-coordinate."""
     return min(pegs, key = lambda peg: abs(peg.matrix_world.translation[1] - y_coordinate))
 
+
+def get_closest_temp_peg(y_coordinate):
+    """Returns the blender object for the peg that is closest to the supplied y-coordinate."""
+    return min(temp_pegs, key = lambda peg: abs(peg.matrix_world.translation[1] - y_coordinate))
+
+
 def sensor_x_to_value(x):
     """Given a sensor's x-coordinate, what [0,1] is the input position?"""
     # track_zero and track_one are their centers, and there's a middle track.
@@ -324,14 +331,13 @@ def set_carriage_state_from_input_pegs(frame, frames_per_peg):
     pegA = get_closest_peg(sensorA.matrix_world.translation[1])
     pegB = get_closest_peg(sensorB.matrix_world.translation[1])
     pegC = get_closest_peg(sensorC.matrix_world.translation[1])
-    pegLeft = get_closest_peg(sensorLeft.matrix_world.translation[1])
-    pegRight = get_closest_peg(sensorRight.matrix_world.translation[1])
+    pegLeft = get_closest_temp_peg(sensorLeft.matrix_world.translation[1])
+    pegRight = get_closest_temp_peg(sensorRight.matrix_world.translation[1])
     a = get_new_input_position(pegA, sensorA, frames_per_peg)
     b = get_new_input_position(pegB, sensorB, frames_per_peg)
     c = get_new_input_position(pegC, sensorC, frames_per_peg)
     left = get_new_input_position(pegLeft, sensorLeft, frames_per_peg)
     right = get_new_input_position(pegRight, sensorRight, frames_per_peg)
-    print(f"left = {left}  right = {right}")
     set_state(a, b, c, left, right, frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     # print(f"After setting state got sensorC.matrix_world.translation[0] == {sensorC.matrix_world.translation[0]}")
@@ -351,7 +357,8 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     sensorB.animation_data_clear()
     carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
     a = b = c = 0
-    set_state(a, b, c, 0, 0, 0)
+    left = right = 0.5 
+    set_state(a, b, c, left, right, 0)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     for frame in range(num_frames):
         # print("\nSetting inputs for new carriage position.\n")
