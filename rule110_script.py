@@ -66,6 +66,10 @@ T = bpy.data.objects.get("T")
 T.animation_data_clear()
 Output5 = bpy.data.objects.get("output5")
 Output5.animation_data_clear()
+UpdaterLeft = bpy.data.objects.get("UpdaterLeft")
+UpdaterLeft.animation_data_clear()
+UpdaterRight = bpy.data.objects.get("UpdaterRight")
+UpdaterRight.animation_data_clear()
 
 # rod positions that have hysteresis
 a = 0
@@ -88,7 +92,7 @@ temp_zero = bpy.data.objects.get("TempZero").matrix_world.translation[0]
 temp_one = bpy.data.objects.get("TempOne").matrix_world.translation[0]
 
 
-def set_state(a, b, c, frame):
+def set_state(a, b, c, left, right, frame):
     global output1, output2, output4, output5
 
     input_x_offset = 0.1
@@ -105,6 +109,7 @@ def set_state(a, b, c, frame):
     q_x_offset = 0.705
     t_x_offset = 0.695
     output5_x_offset = 1.16
+    updater_x_offset = 0.494529
 
     not_a = 1 - a
     not_b = 1 - b
@@ -199,6 +204,10 @@ def set_state(a, b, c, frame):
     T.keyframe_insert(data_path="location", frame=frame, index=0)
     Output5.location[0] = output5_x_offset + output5 * travel
     Output5.keyframe_insert(data_path="location", frame=frame, index=0)
+    UpdaterLeft.location[0] = updater_x_offset + left * travel
+    UpdaterLeft.keyframe_insert(data_path="location", frame=frame, index=0)
+    UpdaterRight.location[0] = updater_x_offset + right * travel
+    UpdaterRight.keyframe_insert(data_path="location", frame=frame, index=0)
 
 
 def demo_3bit_cycle():
@@ -221,7 +230,7 @@ def demo_3bit_cycle():
         # a period of stasis
         values = [int(inputs[j]) for j in range(3)]
         for i in range(static_frames):
-            set_state(*values, frame)
+            set_state(values[0], values[1], values[2], 0, 0, frame)
             frame += 1
         old_inputs = inputs
 
@@ -310,15 +319,20 @@ def set_carriage_state_from_input_pegs(frame, frames_per_peg):
     sensorA = bpy.data.objects.get("SensorA")
     sensorB = bpy.data.objects.get("SensorB")
     sensorC = bpy.data.objects.get("SensorC")
+    sensorLeft = bpy.data.objects.get("SensorLeft")
+    sensorRight = bpy.data.objects.get("SensorRight")
     pegA = get_closest_peg(sensorA.matrix_world.translation[1])
     pegB = get_closest_peg(sensorB.matrix_world.translation[1])
     pegC = get_closest_peg(sensorC.matrix_world.translation[1])
+    pegLeft = get_closest_peg(sensorLeft.matrix_world.translation[1])
+    pegRight = get_closest_peg(sensorRight.matrix_world.translation[1])
     a = get_new_input_position(pegA, sensorA, frames_per_peg)
     b = get_new_input_position(pegB, sensorB, frames_per_peg)
-    # print("Adjusting sensor C")
     c = get_new_input_position(pegC, sensorC, frames_per_peg)
-    # print(f"Setting state for c = {c}")
-    set_state(a, b, c, frame)
+    left = get_new_input_position(pegLeft, sensorLeft, frames_per_peg)
+    right = get_new_input_position(pegRight, sensorRight, frames_per_peg)
+    print(f"left = {left}  right = {right}")
+    set_state(a, b, c, left, right, frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     # print(f"After setting state got sensorC.matrix_world.translation[0] == {sensorC.matrix_world.translation[0]}")
 
@@ -337,7 +351,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     sensorB.animation_data_clear()
     carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
     a = b = c = 0
-    set_state(a, b, c, 0)
+    set_state(a, b, c, 0, 0, 0)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     for frame in range(num_frames):
         # print("\nSetting inputs for new carriage position.\n")
