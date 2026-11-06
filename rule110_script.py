@@ -256,14 +256,14 @@ def sensor_x_to_value(x):
     # print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
     return (x - zero_x) / (one_x - zero_x)
 
-def get_new_input_position(peg, sensor):
+def get_new_input_position(peg, sensor, frames_per_peg):
     "The carriage has moved sideways, what should this input rods new position be?"""
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     sensor_pos = np.array(sensor.matrix_world.translation)
     peg_pos = np.array(peg.matrix_world.translation)
     # TODO: just a simple technique for now, couldn't get pretend physics to work
     value = sensor_x_to_value(sensor_pos[0])
-    max_speed = 0.1  # TODO:  2 / frames_per_peg maybe?
+    max_speed = 2 / frames_per_peg
     if peg_pos[0] > sensor_pos[0]:
         return max(value - max_speed, 0)
     else:
@@ -302,7 +302,7 @@ def get_new_input_position(peg, sensor):
     return new_value
 
 
-def set_carriage_state_from_input_pegs(frame):
+def set_carriage_state_from_input_pegs(frame, frames_per_peg):
     """Given the current position of the carriage and the input pegs, set the internal carriage state to match."""
     global a, b, c  # the inputs before the carriage moved to this position (hysteresis)
     # set the inputs based on the closest pegs (TODO: animate pushing properly)
@@ -313,10 +313,10 @@ def set_carriage_state_from_input_pegs(frame):
     pegA = get_closest_peg(sensorA.matrix_world.translation[1])
     pegB = get_closest_peg(sensorB.matrix_world.translation[1])
     pegC = get_closest_peg(sensorC.matrix_world.translation[1])
-    a = get_new_input_position(pegA, sensorA)
-    b = get_new_input_position(pegB, sensorB)
+    a = get_new_input_position(pegA, sensorA, frames_per_peg)
+    b = get_new_input_position(pegB, sensorB, frames_per_peg)
     # print("Adjusting sensor C")
-    c = get_new_input_position(pegC, sensorC)
+    c = get_new_input_position(pegC, sensorC, frames_per_peg)
     # print(f"Setting state for c = {c}")
     set_state(a, b, c, frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
@@ -343,7 +343,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
         # print("\nSetting inputs for new carriage position.\n")
         carriage.location[1] = carriage_offset + start_peg.matrix_world.translation[1] + (end_peg.matrix_world.translation[1] - start_peg.matrix_world.translation[1]) * frame / (num_frames - 1)
         carriage.keyframe_insert(data_path="location", frame=frame, index=1)
-        set_carriage_state_from_input_pegs(frame)
+        set_carriage_state_from_input_pegs(frame, frames_per_peg)
     # finally update the scene to the current frame
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
     print("Done")
@@ -354,4 +354,4 @@ peg_values = [0] * num_pegs
 peg_values[46] = 1
 set_input_pegs(peg_values)
 #demo_3bit_cycle() 
-animate_carriage(41, 49, frames_per_peg = 50)
+animate_carriage(41, 49, frames_per_peg = 20)
