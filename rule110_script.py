@@ -345,9 +345,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
 os.system("cls")
 peg_values = [0] * num_pegs
 peg_values[46] = 1
-peg_values[47] = 1
-peg_values[49] = 1
 set_input_pegs(peg_values)
-#demo_3bit_cycle()
-animate_carriage(42, 53, frames_per_peg = 20)
+#demo_3bit_cycle() 
+animate_carriage(43, 49, frames_per_peg = 50)
  
