@@ -84,6 +84,8 @@ sensor_square_radius = travel / math.sqrt(2)  # distance from diamond center to 
 
 track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
 track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
+temp_zero = bpy.data.objects.get("TempZero").matrix_world.translation[0]
+temp_one = bpy.data.objects.get("TempOne").matrix_world.translation[0]
 
 
 def set_state(a, b, c, frame):
@@ -235,6 +237,11 @@ def set_input_pegs(peg_values):
         peg = bpy.data.objects.get(f"Peg.{peg_idx:03d}")
         peg.animation_data_clear()
         peg.location[0] = track_zero + (track_one - track_zero) * peg_value
+        # Duplicate onto the temp teack
+        temp_peg = bpy.data.objects.get(f"TempPeg.{peg_idx:03d}")
+        temp_peg.animation_data_clear()
+        temp_peg.location[0] = temp_zero + (temp_one - temp_zero) * peg_value
+        # temp_peg.location[1] = peg.location[1]  # fix the y-alignment (was only needed once)
 
 
 def get_closest_peg(y_coordinate):
