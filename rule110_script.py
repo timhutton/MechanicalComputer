@@ -266,8 +266,8 @@ def sensor_x_to_value(x, is_temp=False):
     """Given a sensor's x-coordinate, what [0,1] is the input position?"""
     if is_temp:
         # track_zero and track_one are their centers, and there's a middle track.
-        one_x = temp_zero - travel / 2  # sensor = 1  => sensor is at track zero
-        zero_x = temp_one + travel / 2  # sensor = 0  => sensor is at track one
+        one_x = temp_zero + travel / 2  # sensor = 1  => sensor is at track zero
+        zero_x = temp_one - travel / 2  # sensor = 0  => sensor is at track one
         # print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
         return (x - zero_x) / (one_x - zero_x)
     else:
@@ -282,12 +282,12 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     sensor_pos = np.array(sensor.matrix_world.translation)
     peg_pos = np.array(peg.matrix_world.translation)
-    # TODO: just a simple technique for now, couldn't get pretend physics to work
-    #new_ = sensor_x_to_value(sensor_pos[0], is_temp)
     if peg_pos[0] > sensor_pos[0]:
         return min(1, max(0, sensor_x_to_value(sensor_pos[0] - expected_travel, is_temp)))
     else:
         return min(1, max(0, sensor_x_to_value(sensor_pos[0] + expected_travel, is_temp)))
+    """
+    Couldn't get this approach to work, abandoned for now.
     # iteratively tweak sensor_pos until no more overlap
     # (an analytic solution certainly exists but it was too hard to work out)
     print(f"sensor_pos = {sensor_pos}  peg_pos = {peg_pos}")
@@ -319,7 +319,7 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
     new_value = sensor_x_to_value(sensor_pos[0])
     new_value = min(max(new_value, 0), 1)
     print(f"get_new_input_position() returning {new_value}")
-    return new_value
+    return new_value"""
 
 
 def set_carriage_state_from_input_pegs(frame, frames_per_peg):
