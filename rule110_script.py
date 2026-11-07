@@ -85,6 +85,7 @@ pegs = [bpy.data.objects.get(f"Peg.{peg_idx:03d}") for peg_idx in range(num_pegs
 temp_pegs = [bpy.data.objects.get(f"TempPeg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
 peg_radius = 0.095
 travel = 0.2  # how far the inputs move
+peg_separation = abs(pegs[1].matrix_world.translation[1] - pegs[0].matrix_world.translation[1])
 sensor_square_radius = travel / math.sqrt(2)  # distance from diamond center to edge midpoint
 
 track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
@@ -279,18 +280,17 @@ def sensor_x_to_value(x, is_temp=False):
         # print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
         return (x - zero_x) / (one_x - zero_x)
 
-def get_new_input_position(peg, sensor, frames_per_peg, is_temp=False):
+def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
     "The carriage has moved sideways, what should this input rods new position be?"""
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     sensor_pos = np.array(sensor.matrix_world.translation)
     peg_pos = np.array(peg.matrix_world.translation)
     # TODO: just a simple technique for now, couldn't get pretend physics to work
     #new_ = sensor_x_to_value(sensor_pos[0], is_temp)
-    max_speed = 2 * travel / frames_per_peg
     if peg_pos[0] > sensor_pos[0]:
-        return min(1, max(0, sensor_x_to_value(sensor_pos[0] - max_speed, is_temp)))
+        return min(1, max(0, sensor_x_to_value(sensor_pos[0] - expected_travel, is_temp)))
     else:
-        return min(1, max(0, sensor_x_to_value(sensor_pos[0] + max_speed, is_temp)))
+        return min(1, max(0, sensor_x_to_value(sensor_pos[0] + expected_travel, is_temp)))
     # iteratively tweak sensor_pos until no more overlap
     # (an analytic solution certainly exists but it was too hard to work out)
     print(f"sensor_pos = {sensor_pos}  peg_pos = {peg_pos}")
@@ -340,11 +340,12 @@ def set_carriage_state_from_input_pegs(frame, frames_per_peg):
     pegC = get_closest_peg(sensorC.matrix_world.translation[1])
     pegLeft = get_closest_temp_peg(sensorLeft.matrix_world.translation[1])
     pegRight = get_closest_temp_peg(sensorRight.matrix_world.translation[1])
-    a = get_new_input_position(pegA, sensorA, frames_per_peg)
-    b = get_new_input_position(pegB, sensorB, frames_per_peg)
-    c = get_new_input_position(pegC, sensorC, frames_per_peg)
-    left = get_new_input_position(pegLeft, sensorLeft, frames_per_peg, True)
-    right = get_new_input_position(pegRight, sensorRight, frames_per_peg, True)
+    expected_travel = peg_separation / frames_per_peg  # since sensors have 45 degree angles
+    a = get_new_input_position(pegA, sensorA, expected_travel)
+    b = get_new_input_position(pegB, sensorB, expected_travel)
+    c = get_new_input_position(pegC, sensorC, expected_travel)
+    left = get_new_input_position(pegLeft, sensorLeft, expected_travel, True)
+    right = get_new_input_position(pegRight, sensorRight, expected_travel, True)
     #print(f"Would set left = {left}, right = {right}")
     set_state(a, b, c, left, right, frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
@@ -383,4 +384,4 @@ peg_values = [0] * num_pegs
 peg_values[46] = 1
 set_input_pegs(peg_values)
 #demo_3bit_cycle() 
-animate_carriage(41, 43, frames_per_peg = 4)
+animate_carriage(42, 49, frames_per_peg = 30)
