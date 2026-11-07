@@ -72,9 +72,6 @@ UpdaterRight = bpy.data.objects.get("UpdaterRight")
 UpdaterRight.animation_data_clear()
 
 # rod positions that have hysteresis
-a = 0
-b = 0
-c = 0
 output1 = 0
 output2 = 0
 output4 = 0
@@ -327,7 +324,6 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
 
 def set_carriage_state_from_input_pegs(frame, frames_per_peg):
     """Given the current position of the carriage and the input pegs, set the internal carriage state to match."""
-    global a, b, c  # the inputs before the carriage moved to this position (hysteresis)
     # set the inputs based on the closest pegs (TODO: animate pushing properly)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     sensorA = bpy.data.objects.get("SensorA")
@@ -365,6 +361,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     sensorB = bpy.data.objects.get("SensorB")
     sensorB.animation_data_clear()
     carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
+    # with current approach for pretend-physics we need to start the carriage in a valid (non-overlapping) state
     a = b = c = 0
     left = right = 0 
     set_state(a, b, c, left, right, 0)
