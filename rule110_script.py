@@ -353,7 +353,7 @@ def set_carriage_state_from_input_pegs(frame, frames_per_peg):
 
 def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     """peg_start and peg_end are indices of the peg to be at SensorB"""
-    num_frames = abs(end_peg_idx - start_peg_idx + 1) * frames_per_peg
+    num_frames = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
     bpy.data.scenes[0].frame_start = 0
     bpy.data.scenes[0].frame_end = num_frames - 1
     start_peg = bpy.data.objects.get(f"Peg.{start_peg_idx:03d}")
@@ -383,4 +383,4 @@ peg_values = [0] * num_pegs
 peg_values[46] = 1
 set_input_pegs(peg_values)
 #demo_3bit_cycle() 
-animate_carriage(41, 49, frames_per_peg = 20)
+animate_carriage(41, 43, frames_per_peg = 4)
