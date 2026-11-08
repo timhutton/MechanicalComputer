@@ -71,6 +71,8 @@ UpdaterLeft.animation_data_clear()
 UpdaterRight = bpy.data.objects.get("UpdaterRight")
 UpdaterRight.animation_data_clear()
 OutputActuatorCenter = bpy.data.objects.get("OutputActuatorCenter")
+UpdaterLeftCenter = bpy.data.objects.get("UpdaterLeftCenter")
+UpdaterRightCenter = bpy.data.objects.get("UpdaterRightCenter")
 
 # rod positions that have hysteresis
 output1 = 0
@@ -371,7 +373,19 @@ def update_pegs(frame):
     new_peg_x = min(allowed_x_range[1], max(allowed_x_range[0], peg_x))
     new_peg_value = (new_peg_x - temp_zero) / (temp_one - temp_zero)
     temp_peg_values[temp_pegs.index(peg)] = new_peg_value
-    # TODO: repeat for other peg movements
+    # updater actuators
+    for actuator in [UpdaterLeftCenter, UpdaterRightCenter]:
+        actuator_x = actuator.matrix_world.translation[0]
+        actuator_y = actuator.matrix_world.translation[1]
+        peg = get_closest_peg(actuator_y)
+        peg_x = peg.matrix_world.translation[0]
+        peg_y = peg.matrix_world.translation[1]
+        y_difference = abs(peg_y - actuator_y)
+        allowed_x_range = [actuator_x - y_difference, actuator_x + y_difference]
+        new_peg_x = min(allowed_x_range[1], max(allowed_x_range[0], peg_x))
+        new_peg_value = (new_peg_x - track_zero) / (track_one - track_zero)
+        peg_values[pegs.index(peg)] = new_peg_value
+    # TODO: repeat for the correctors
     # finally set keyframes for all pegs in this frame
     keyframe_pegs(frame)
 
@@ -408,6 +422,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
 
 os.system("cls")
 peg_values[46] = 1  # the initial 1 in the rule110 input pattern
+temp_peg_values[46] = 1  # keep it in sync with the main tape
 set_pegs(peg_values, temp_peg_values)
 #demo_3bit_cycle() 
 animate_carriage(42, 51, frames_per_peg = 20)
