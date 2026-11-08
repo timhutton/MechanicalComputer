@@ -239,17 +239,16 @@ def demo_3bit_cycle():
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
 
 
-def set_input_pegs(peg_values):
+def set_pegs(peg_values, temp_peg_values):
     """Move each input peg to a [0,1] position."""
     for peg_idx, peg_value in enumerate(peg_values):
         peg = bpy.data.objects.get(f"Peg.{peg_idx:03d}")
         peg.animation_data_clear()
         peg.location[0] = track_zero + (track_one - track_zero) * peg_value
-        # Duplicate onto the temp teack
+    for peg_idx, peg_value in enumerate(temp_peg_values):
         temp_peg = bpy.data.objects.get(f"TempPeg.{peg_idx:03d}")
         temp_peg.animation_data_clear()
         temp_peg.location[0] = temp_zero + (temp_one - temp_zero) * peg_value
-        # temp_peg.location[1] = peg.location[1]  # fix the y-alignment (was only needed once)
 
 
 def get_closest_peg(y_coordinate):
@@ -378,7 +377,11 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
 
 os.system("cls")
 peg_values = [0] * num_pegs
-peg_values[46] = 1
-set_input_pegs(peg_values)
+peg_values[46] = 1  # the initial 1 in the rule110 input pattern
+temp_peg_values = [v for v in peg_values]  # the temp track is usually a copy of the main track
+peg_values[39] = 0.25  # currently positioned in UpdaterLeft
+temp_peg_values[42] = 0.25  # currently positioned in OutputActuator
+peg_values[45] = 0.25  # currently positioned in UpdaterRight
+set_pegs(peg_values, temp_peg_values)
 #demo_3bit_cycle() 
 animate_carriage(42, 51, frames_per_peg = 20)
