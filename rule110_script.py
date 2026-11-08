@@ -108,7 +108,7 @@ def set_state(a, b, c, left, right, frame):
     q_x_offset = 0.705
     t_x_offset = 0.695
     output5_x_offset = 1.16
-    updater_x_offset = 0.494529
+    updater_x_offset = 0.482
 
     not_a = 1 - a
     not_b = 1 - b
@@ -363,7 +363,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
     # with current approach for pretend-physics we need to start the carriage in a valid (non-overlapping) state
     a = b = c = 0
-    left = right = 0 
+    left = right = 0
     set_state(a, b, c, left, right, 0)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     for frame in range(num_frames):
@@ -381,4 +381,4 @@ peg_values = [0] * num_pegs
 peg_values[46] = 1
 set_input_pegs(peg_values)
 #demo_3bit_cycle() 
-animate_carriage(42, 49, frames_per_peg = 30)
+animate_carriage(42, 51, frames_per_peg = 20)
