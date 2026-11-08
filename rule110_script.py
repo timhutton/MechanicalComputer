@@ -457,11 +457,11 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
 
 os.system("cls")
 peg_values[46] = 1  # the initial 1 in the rule110 input pattern
-peg_values[47] = 1  # the initial 1 in the rule110 input pattern
-peg_values[48] = 1  # the initial 1 in the rule110 input pattern
-peg_values[49] = 1  # the initial 1 in the rule110 input pattern
-peg_values[50] = 1  # the initial 1 in the rule110 input pattern
+#peg_values[47] = 1  # the initial 1 in the rule110 input pattern
+#peg_values[48] = 1  # the initial 1 in the rule110 input pattern
+#peg_values[49] = 1  # the initial 1 in the rule110 input pattern
+#peg_values[50] = 1  # the initial 1 in the rule110 input pattern
 temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
 set_pegs(peg_values, temp_peg_values)
 #demo_3bit_cycle() 
-animate_carriage(42, 56, frames_per_peg=30)
+animate_carriage(41, 52, frames_per_peg=30)
