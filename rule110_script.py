@@ -396,14 +396,14 @@ def update_pegs(frame):
         peg = get_closest_peg(corrector_y)
         peg_x = peg.matrix_world.translation[0]
         peg_y = peg.matrix_world.translation[1]
-        corrector_width = travel
+        corrector_half_width = travel / 2
         y_difference = abs(peg_y - corrector_y)
-        if y_difference < corrector_width / 2 + peg_radius:  # (otherwise no effect)
-            # TODO just set for now
+        if y_difference < corrector_half_width + peg_radius:  # (otherwise no effect)
             if peg_x > corrector_x:
-                new_peg_value = 0
+                new_peg_x = max(peg_x, corrector_x - y_difference + corrector_half_width + peg_radius)
             else:
-                new_peg_value = 1
+                new_peg_x = min(peg_x, corrector_x + y_difference - corrector_half_width - peg_radius)
+            new_peg_value = (new_peg_x - track_zero) / (track_one - track_zero)
             peg_values[pegs.index(peg)] = new_peg_value
     # temp tape correctors
     for corrector in temp_correctors:
@@ -412,14 +412,14 @@ def update_pegs(frame):
         peg = get_closest_temp_peg(corrector_y)
         peg_x = peg.matrix_world.translation[0]
         peg_y = peg.matrix_world.translation[1]
-        corrector_width = travel
+        corrector_half_width = travel / 2
         y_difference = abs(peg_y - corrector_y)
-        if y_difference < corrector_width / 2 + peg_radius:  # (otherwise no effect)
-            # TODO just set for now
+        if y_difference < corrector_half_width + peg_radius:  # (otherwise no effect)
             if peg_x > corrector_x:
-                new_peg_value = 1
+                new_peg_x = max(peg_x, corrector_x - y_difference + corrector_half_width + peg_radius)
             else:
-                new_peg_value = 0
+                new_peg_x = min(peg_x, corrector_x + y_difference - corrector_half_width - peg_radius)
+            new_peg_value = (new_peg_x - temp_zero) / (temp_one - temp_zero)
             temp_peg_values[temp_pegs.index(peg)] = new_peg_value
     # finally set keyframes for all pegs in this frame
     keyframe_pegs(frame)
@@ -460,4 +460,4 @@ peg_values[46] = 1  # the initial 1 in the rule110 input pattern
 temp_peg_values[46] = 1  # keep it in sync with the main tape
 set_pegs(peg_values, temp_peg_values)
 #demo_3bit_cycle() 
-animate_carriage(42, 51, frames_per_peg = 20)
+animate_carriage(42, 53, frames_per_peg=30)
