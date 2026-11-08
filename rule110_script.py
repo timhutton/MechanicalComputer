@@ -70,6 +70,7 @@ UpdaterLeft = bpy.data.objects.get("UpdaterLeft")
 UpdaterLeft.animation_data_clear()
 UpdaterRight = bpy.data.objects.get("UpdaterRight")
 UpdaterRight.animation_data_clear()
+OutputActuatorCenter = bpy.data.objects.get("OutputActuatorCenter")
 
 # rod positions that have hysteresis
 output1 = 0
@@ -80,6 +81,8 @@ output5 = 0
 num_pegs = 94
 pegs = [bpy.data.objects.get(f"Peg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
 temp_pegs = [bpy.data.objects.get(f"TempPeg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
+peg_values = [0] * num_pegs
+temp_peg_values = [0] * num_pegs
 peg_radius = 0.095
 travel = 0.2  # how far the inputs move
 peg_separation = abs(pegs[1].matrix_world.translation[1] - pegs[0].matrix_world.translation[1])
@@ -249,6 +252,16 @@ def set_pegs(peg_values, temp_peg_values):
         peg.location[0] = temp_zero + (temp_one - temp_zero) * peg_value
 
 
+def keyframe_pegs(frame):
+    """Move each peg to a the specified position in [0, 1]."""
+    for peg, peg_value in zip(pegs, peg_values):
+        peg.location[0] = track_zero + (track_one - track_zero) * peg_value
+        peg.keyframe_insert(data_path="location", frame=frame, index=0)
+    for peg, peg_value in zip(temp_pegs, temp_peg_values):
+        peg.location[0] = temp_zero + (temp_one - temp_zero) * peg_value
+        peg.keyframe_insert(data_path="location", frame=frame, index=0)
+
+
 def get_closest_peg(y_coordinate):
     """Returns the blender object for the peg that is closest to the supplied y-coordinate."""
     return min(pegs, key = lambda peg: abs(peg.matrix_world.translation[1] - y_coordinate))
@@ -319,7 +332,7 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
     return new_value"""
 
 
-def set_carriage_state_from_input_pegs(frame, frames_per_peg):
+def set_carriage_state_from_pegs(frame, frames_per_peg):
     """Given the current position of the carriage and the input pegs, set the internal carriage state to match."""
     # set the inputs based on the closest pegs (TODO: animate pushing properly)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
@@ -345,6 +358,24 @@ def set_carriage_state_from_input_pegs(frame, frames_per_peg):
     # print(f"After setting state got sensorC.matrix_world.translation[0] == {sensorC.matrix_world.translation[0]}")
 
 
+def update_pegs(frame):
+    """Push the pegs where moved by actuators, correctors and maybe sensors."""
+    # actuators
+    output_actuator_x = OutputActuatorCenter.matrix_world.translation[0]
+    output_actuator_y = OutputActuatorCenter.matrix_world.translation[1]
+    peg = get_closest_temp_peg(output_actuator_y)
+    peg_x = peg.matrix_world.translation[0]
+    peg_y = peg.matrix_world.translation[1]
+    y_difference = abs(peg_y - output_actuator_y)
+    allowed_x_range = [output_actuator_x - y_difference, output_actuator_x + y_difference]
+    new_peg_x = min(allowed_x_range[1], max(allowed_x_range[0], peg_x))
+    new_peg_value = (new_peg_x - temp_zero) / (temp_one - temp_zero)
+    temp_peg_values[temp_pegs.index(peg)] = new_peg_value
+    # TODO: repeat for other peg movements
+    # finally set keyframes for all pegs in this frame
+    keyframe_pegs(frame)
+
+
 def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     """peg_start and peg_end are indices of the peg to be at SensorB"""
     num_frames = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
@@ -362,24 +393,21 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     a = b = c = 0
     left = right = 0
     set_state(a, b, c, left, right, 0)
+    update_pegs(0)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     for frame in range(num_frames):
         # print("\nSetting inputs for new carriage position.\n")
         carriage.location[1] = carriage_offset + start_peg.matrix_world.translation[1] + (end_peg.matrix_world.translation[1] - start_peg.matrix_world.translation[1]) * frame / (num_frames - 1)
         carriage.keyframe_insert(data_path="location", frame=frame, index=1)
-        set_carriage_state_from_input_pegs(frame, frames_per_peg)
+        set_carriage_state_from_pegs(frame, frames_per_peg)
+        update_pegs(frame)
     # finally update the scene to the current frame
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
     print("Done")
 
 
 os.system("cls")
-peg_values = [0] * num_pegs
 peg_values[46] = 1  # the initial 1 in the rule110 input pattern
-temp_peg_values = [v for v in peg_values]  # the temp track is usually a copy of the main track
-peg_values[39] = 0.25  # currently positioned in UpdaterLeft
-temp_peg_values[42] = 0.25  # currently positioned in OutputActuator
-peg_values[45] = 0.25  # currently positioned in UpdaterRight
 set_pegs(peg_values, temp_peg_values)
 #demo_3bit_cycle() 
 animate_carriage(42, 51, frames_per_peg = 20)
