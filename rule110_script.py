@@ -90,6 +90,10 @@ travel = 0.2  # how far the inputs move
 peg_separation = abs(pegs[1].matrix_world.translation[1] - pegs[0].matrix_world.translation[1])
 sensor_square_radius = travel / math.sqrt(2)  # distance from diamond center to edge midpoint
 
+correctors = [bpy.data.objects.get(f"Corrector{idx + 1}") for idx in range(4)]
+temp_correctors = [bpy.data.objects.get(f"TempCorrector{idx + 1}") for idx in range(2)]
+
+
 track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
 track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
 temp_zero = bpy.data.objects.get("TempZero").matrix_world.translation[0]
@@ -385,7 +389,38 @@ def update_pegs(frame):
         new_peg_x = min(allowed_x_range[1], max(allowed_x_range[0], peg_x))
         new_peg_value = (new_peg_x - track_zero) / (track_one - track_zero)
         peg_values[pegs.index(peg)] = new_peg_value
-    # TODO: repeat for the correctors
+    # main tape correctors
+    for corrector in correctors:
+        corrector_x = corrector.matrix_world.translation[0]
+        corrector_y = corrector.matrix_world.translation[1]
+        peg = get_closest_peg(corrector_y)
+        peg_x = peg.matrix_world.translation[0]
+        peg_y = peg.matrix_world.translation[1]
+        corrector_width = travel
+        y_difference = abs(peg_y - corrector_y)
+        if y_difference < corrector_width / 2 + peg_radius:  # (otherwise no effect)
+            # TODO just set for now
+            if peg_x > corrector_x:
+                new_peg_value = 0
+            else:
+                new_peg_value = 1
+            peg_values[pegs.index(peg)] = new_peg_value
+    # temp tape correctors
+    for corrector in temp_correctors:
+        corrector_x = corrector.matrix_world.translation[0]
+        corrector_y = corrector.matrix_world.translation[1]
+        peg = get_closest_temp_peg(corrector_y)
+        peg_x = peg.matrix_world.translation[0]
+        peg_y = peg.matrix_world.translation[1]
+        corrector_width = travel
+        y_difference = abs(peg_y - corrector_y)
+        if y_difference < corrector_width / 2 + peg_radius:  # (otherwise no effect)
+            # TODO just set for now
+            if peg_x > corrector_x:
+                new_peg_value = 1
+            else:
+                new_peg_value = 0
+            temp_peg_values[temp_pegs.index(peg)] = new_peg_value
     # finally set keyframes for all pegs in this frame
     keyframe_pegs(frame)
 
