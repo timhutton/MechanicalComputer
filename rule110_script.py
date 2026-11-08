@@ -240,15 +240,13 @@ def demo_3bit_cycle():
 
 
 def set_pegs(peg_values, temp_peg_values):
-    """Move each input peg to a [0,1] position."""
-    for peg_idx, peg_value in enumerate(peg_values):
-        peg = bpy.data.objects.get(f"Peg.{peg_idx:03d}")
+    """Move each peg to a the specified position in [0, 1]."""
+    for peg, peg_value in zip(pegs, peg_values):
         peg.animation_data_clear()
         peg.location[0] = track_zero + (track_one - track_zero) * peg_value
-    for peg_idx, peg_value in enumerate(temp_peg_values):
-        temp_peg = bpy.data.objects.get(f"TempPeg.{peg_idx:03d}")
-        temp_peg.animation_data_clear()
-        temp_peg.location[0] = temp_zero + (temp_one - temp_zero) * peg_value
+    for peg, peg_value in zip(temp_pegs, temp_peg_values):
+        peg.animation_data_clear()
+        peg.location[0] = temp_zero + (temp_one - temp_zero) * peg_value
 
 
 def get_closest_peg(y_coordinate):
