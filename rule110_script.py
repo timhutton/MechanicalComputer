@@ -425,9 +425,10 @@ def update_pegs(frame):
     keyframe_pegs(frame)
 
 
-def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
+def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20):
     """peg_start and peg_end are indices of the peg to be at SensorB"""
-    num_frames = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
+    num_frames_per_pass = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
+    num_frames = num_frames_per_pass * num_passes
     bpy.data.scenes[0].frame_start = 0
     bpy.data.scenes[0].frame_end = num_frames - 1
     start_peg = bpy.data.objects.get(f"Peg.{start_peg_idx:03d}")
@@ -444,12 +445,18 @@ def animate_carriage(start_peg_idx, end_peg_idx, frames_per_peg=20):
     set_state(a, b, c, left, right, 0)
     update_pegs(0)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
-    for frame in range(num_frames):
-        # print("\nSetting inputs for new carriage position.\n")
-        carriage.location[1] = carriage_offset + start_peg.matrix_world.translation[1] + (end_peg.matrix_world.translation[1] - start_peg.matrix_world.translation[1]) * frame / (num_frames - 1)
-        carriage.keyframe_insert(data_path="location", frame=frame, index=1)
-        set_carriage_state_from_pegs(frame, frames_per_peg)
-        update_pegs(frame)
+    frame = 0
+    for pass_idx in range(num_passes):
+        for pass_frame in range(num_frames_per_pass):
+            # print("\nSetting inputs for new carriage position.\n")
+            if (pass_idx % 2) == 0:
+                carriage.location[1] = carriage_offset + start_peg.matrix_world.translation[1] + (end_peg.matrix_world.translation[1] - start_peg.matrix_world.translation[1]) * pass_frame / (num_frames_per_pass - 1)
+            else:
+                carriage.location[1] = carriage_offset + end_peg.matrix_world.translation[1] + (start_peg.matrix_world.translation[1] - end_peg.matrix_world.translation[1]) * pass_frame / (num_frames_per_pass - 1)
+            carriage.keyframe_insert(data_path="location", frame=frame, index=1)
+            set_carriage_state_from_pegs(frame, frames_per_peg)
+            update_pegs(frame)
+            frame += 1
     # finally update the scene to the current frame
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
     print("Done")
@@ -464,4 +471,4 @@ peg_values[46] = 1  # the initial 1 in the rule110 input pattern
 temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
 set_pegs(peg_values, temp_peg_values)
 #demo_3bit_cycle() 
-animate_carriage(41, 52, frames_per_peg=30)
+animate_carriage(34, 54, num_passes=7, frames_per_peg=5)
