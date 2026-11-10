@@ -311,40 +311,6 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
         return min(1, max(0, sensor_x_to_value(sensor_pos[0] - expected_travel, is_temp)))
     else:
         return min(1, max(0, sensor_x_to_value(sensor_pos[0] + expected_travel, is_temp)))
-    """
-    Couldn't get this approach to work, abandoned for now.
-    # iteratively tweak sensor_pos until no more overlap
-    # (an analytic solution certainly exists but it was too hard to work out)
-    print(f"sensor_pos = {sensor_pos}  peg_pos = {peg_pos}")
-    while True:
-        # vector from sensor center to peg center
-        v = peg_pos - sensor_pos
-        v[2] = 0
-        # rotate 45 degrees around the z-axis so that the sensor is now axis-aligned (and ignore z-coordinate)
-        rotated_peg_pos = np.array([math.sqrt(2) * (v[0] - v[1]) / 2, math.sqrt(2) * (v[0] + v[1]) / 2, 0])
-        # clamp to lie in/on the sensor
-        p = np.clip(rotated_peg_pos, -sensor_square_radius, sensor_square_radius)
-        # test if this point is inside the peg
-        d = np.linalg.norm(p - rotated_peg_pos)
-        print(f"v = {v}  p = {p}  rotated_peg_pos = {rotated_peg_pos}  d = {d}  peg_radius = {peg_radius}  sensor_square_radius = {sensor_square_radius}\n")
-        if d > peg_radius:
-            print(f"sensor_pos = {sensor_pos}  peg_pos = {peg_pos}")
-            print(f"|sensor_pos.x - peg_pos.x| = {abs(sensor_pos[0] - peg_pos[0])}")
-            print("sensor not touching peg")
-            break  # sensor does not overlap peg and more, we are done
-        if peg_pos[0] > sensor_pos[0]:
-            sensor_pos[0] -= peg_radius / 10
-        if peg_pos[0] < sensor_pos[0]:  
-            sensor_pos[0] += peg_radius / 10
-        new_value = sensor_x_to_value(sensor_pos[0])
-        print(f"Moved sensor. sensor_pos = {sensor_pos}  new_value = {new_value}")
-        if new_value < 0 or new_value > 1:
-            print(f"WARNING: sensor was pushed off the track! Will clip value")
-            break
-    new_value = sensor_x_to_value(sensor_pos[0])
-    new_value = min(max(new_value, 0), 1)
-    print(f"get_new_input_position() returning {new_value}")
-    return new_value"""
 
 
 def add_stitch_at_current_peg_if_needed(peg, frame):
