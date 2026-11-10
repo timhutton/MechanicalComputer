@@ -3,6 +3,9 @@ import math
 import numpy as np
 import os
 
+dark_yarn = (0.263, 0.212, 0.247, 1.0)  # RGBA for the 1 symbols (darker)
+light_yarn = (0.667, 0.663, 0.545, 1.0)  # RGBA for the 0 symbols (lighter)
+
 # access the objects we will be moving
 A = bpy.data.objects.get("A")
 A.animation_data_clear()
@@ -85,7 +88,6 @@ num_pegs = 94
 pegs = [bpy.data.objects.get(f"Peg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
 temp_pegs = [bpy.data.objects.get(f"TempPeg.{peg_idx:03d}") for peg_idx in range(num_pegs)]
 peg_values = [0] * num_pegs
-temp_peg_values = [0] * num_pegs
 peg_radius = 0.095
 travel = 0.2  # how far the inputs move
 peg_separation = abs(pegs[1].matrix_world.translation[1] - pegs[0].matrix_world.translation[1])
@@ -331,11 +333,15 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
     stitch.location[2] = StitchOutputLocationXZ.matrix_world.translation[2]
     stitch.hide_viewport = False
     stitch.hide_render = False
+    base_color_socket = stitch.data.materials[0].node_tree.nodes["Principled BSDF"].inputs["Base Color"]
     if peg_values[peg_idx] > 0.5:
-        stitch.data.materials[0].diffuse_color = (0.263, 0.212, 0.247, 1.0)  # RGBA for the 1 symbols (darker)
+        stitch.data.materials[0].diffuse_color = dark_yarn
+        base_color_socket.default_value = dark_yarn
     else:
-        stitch.data.materials[0].diffuse_color = (0.667, 0.663, 0.545, 1.0)  # RGBA for the 0 symbols (lighter)
+        stitch.data.materials[0].diffuse_color = light_yarn
+        base_color_socket.default_value = light_yarn
     stitch.data.materials[0].keyframe_insert(data_path="diffuse_color", frame=frame)
+    base_color_socket.keyframe_insert(data_path="default_value", frame=frame)
     stitch.keyframe_insert(data_path="location", frame=frame, index=0)
     stitch.keyframe_insert(data_path="location", frame=frame, index=1)
     stitch.keyframe_insert(data_path="location", frame=frame, index=2)
@@ -476,6 +482,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
         # prepare for next pass
         last_peg_stitched = -1
         move_stitches_down(frame)
+        # TODO: fix issue with an occasional dropped stitch at the end
 
     # finally update the scene to the current frame
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
@@ -483,6 +490,9 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
 
 
 os.system("cls")
+
+bpy.context.scene.frame_set(0)
+
 peg_values[46] = 1  # the initial 1 in the rule110 input pattern
 #peg_values[47] = 1  # the initial 1 in the rule110 input pattern
 #peg_values[48] = 1  # the initial 1 in the rule110 input pattern
@@ -500,8 +510,5 @@ for stitch in stitches:
     stitch.keyframe_insert(data_path="hide_viewport", frame=0)
     stitch.keyframe_insert("hide_render", frame=0)
 
-for peg in pegs + temp_pegs:
-    peg.animation_data_clear()
- 
 #demo_3bit_cycle() 
-animate_carriage(34, 54, num_passes=9, frames_per_peg=2)
+animate_carriage(34, 54, num_passes=5, frames_per_peg=2)
