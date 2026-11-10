@@ -105,6 +105,7 @@ stitches = [bpy.data.objects.get(f"Stitch.{idx:03d}") for idx in range(num_stitc
 next_available_stitch = 0
 last_peg_stitched = -1
 stitch_size = 0.2
+stitches_on_peg = [[] for i in range(num_pegs)]
 
 
 def set_state(a, b, c, left, right, frame):
@@ -348,30 +349,42 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
 
 def add_stitch_at_current_peg_if_needed(peg, frame):
     global last_peg_stitched, next_available_stitch
+    if next_available_stitch >= num_stitches:
+        return  # no stitches left
     peg_idx = int(peg.name.split(".")[-1])
-    if last_peg_stitched == peg_idx:
-        print(f"Peg {peg_idx} already stitched.")
-        return  # we did this one already
+    if last_peg_stitched == peg_idx:  # we did this one already
+        # keyframe all existing stitches to their current position
+        for old_stitch in stitches[:next_available_stitch]:
+            old_stitch.keyframe_insert(data_path="location", frame=frame, index=0)
+            old_stitch.keyframe_insert(data_path="location", frame=frame, index=1)
+            old_stitch.keyframe_insert(data_path="location", frame=frame, index=2)
+        return 
     stitch = stitches[next_available_stitch]
-    print(f"Stitching peg {peg_idx} with stitch {next_available_stitch} = {stitch.name}")
-    stitch.location[0] += StitchOutputLocationXZ.matrix_world.translation[0] - stitch.matrix_world.translation[0]
-    stitch.location[1] += peg.matrix_world.translation[1] - stitch.matrix_world.translation[1]
-    stitch.location[2] += StitchOutputLocationXZ.matrix_world.translation[2] - stitch.matrix_world.translation[2]
+    stitch.location[0] = StitchOutputLocationXZ.matrix_world.translation[0]
+    stitch.location[1] = peg.matrix_world.translation[1]
+    stitch.location[2] = StitchOutputLocationXZ.matrix_world.translation[2]
     stitch.hide_viewport = False
     stitch.hide_render = False
+    if peg_values[peg_idx] > 0.5:
+        stitch.data.materials[0].diffuse_color = (0.0, 0.0, 0.0, 1.0)  # RGBA
+    else:
+        stitch.data.materials[0].diffuse_color = (1.0, 1.0, 1.0, 1.0)  # RGBA
+    stitch.data.materials[0].keyframe_insert(data_path="diffuse_color", frame=frame)
     stitch.keyframe_insert(data_path="location", frame=frame, index=0)
     stitch.keyframe_insert(data_path="location", frame=frame, index=1)
     stitch.keyframe_insert(data_path="location", frame=frame, index=2)
     stitch.keyframe_insert(data_path="hide_viewport", frame=frame)
     stitch.keyframe_insert(data_path="hide_render", frame=frame)
+    stitches_on_peg[peg_idx].append(stitch)
     last_peg_stitched = peg_idx    
     next_available_stitch += 1
 
 
-def move_stitches_down(frame):
-    for stitch in stitches[:next_available_stitch]:
-        stitch.location[2] += stitch_size * 2 
-        stitch.keyframe_insert(data_path="location", frame=frame, index=2)
+def move_stitches_down(frame): 
+    for stitch_list in stitches_on_peg:
+        for stitch in stitch_list:
+            stitch.location[2] += stitch_size * 2 
+            stitch.keyframe_insert(data_path="location", frame=frame, index=2)
 
 
 def set_carriage_state_from_pegs(frame, frames_per_peg):
@@ -514,10 +527,11 @@ set_pegs(peg_values, temp_peg_values)
 
 # stitches live in the scene as invisible until needed
 for stitch in stitches:
+    stitch.animation_data_clear()
     stitch.hide_viewport = True
     stitch.hide_render = True
     stitch.keyframe_insert(data_path="hide_viewport", frame=0)
     stitch.keyframe_insert("hide_render", frame=0)
-
+ 
 #demo_3bit_cycle() 
 animate_carriage(34, 54, num_passes=5, frames_per_peg=5)
