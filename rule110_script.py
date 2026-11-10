@@ -338,6 +338,15 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
     return new_value"""
 
 
+def add_stitch_at_current_peg_if_needed(peg):
+    peg_idx = int(peg.name.split(".")[-1])
+    stitch = bpy.data.objects.get(f"Stitch.{peg_idx:03d}")
+    if not stitch:
+        return  # only a finite number of stitches are available
+    stitch.  TODO: actually need to keyframe the visibility for all stitches on every frame, as well as: inserting new ones, moving them all down at the end of each row
+
+    
+
 def set_carriage_state_from_pegs(frame, frames_per_peg):
     """Given the current position of the carriage and the input pegs, set the internal carriage state to match."""
     # set the inputs based on the closest pegs (TODO: animate pushing properly)
@@ -360,6 +369,7 @@ def set_carriage_state_from_pegs(frame, frames_per_peg):
     right = get_new_input_position(pegRight, sensorRight, expected_travel, True)
     #print(f"Would set left = {left}, right = {right}")
     set_state(a, b, c, left, right, frame)
+    add_stitch_at_current_peg_if_needed(pegB)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     # print(f"After setting state got sensorC.matrix_world.translation[0] == {sensorC.matrix_world.translation[0]}")
 
@@ -471,4 +481,4 @@ peg_values[46] = 1  # the initial 1 in the rule110 input pattern
 temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
 set_pegs(peg_values, temp_peg_values)
 #demo_3bit_cycle() 
-animate_carriage(34, 54, num_passes=7, frames_per_peg=5)
+animate_carriage(34, 54, num_passes=5, frames_per_peg=5)
