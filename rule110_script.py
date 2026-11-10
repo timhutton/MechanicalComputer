@@ -316,7 +316,7 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
 def add_stitch_at_current_peg_if_needed(peg, frame):
     global last_peg_stitched, next_available_stitch
     if next_available_stitch >= num_stitches:
-        return  # no stitches left
+        raise RuntimeError("No stitches left to animate")
     peg_idx = int(peg.name.split(".")[-1])
     if last_peg_stitched == peg_idx:  # we did this one already
         # keyframe all existing stitches to their current position
@@ -332,9 +332,9 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
     stitch.hide_viewport = False
     stitch.hide_render = False
     if peg_values[peg_idx] > 0.5:
-        stitch.data.materials[0].diffuse_color = (0.0, 0.0, 0.0, 1.0)  # RGBA
+        stitch.data.materials[0].diffuse_color = (0.263, 0.212, 0.247, 1.0)  # RGBA for the 1 symbols (darker)
     else:
-        stitch.data.materials[0].diffuse_color = (1.0, 1.0, 1.0, 1.0)  # RGBA
+        stitch.data.materials[0].diffuse_color = (0.667, 0.663, 0.545, 1.0)  # RGBA for the 0 symbols (lighter)
     stitch.data.materials[0].keyframe_insert(data_path="diffuse_color", frame=frame)
     stitch.keyframe_insert(data_path="location", frame=frame, index=0)
     stitch.keyframe_insert(data_path="location", frame=frame, index=1)
@@ -494,10 +494,14 @@ set_pegs(peg_values, temp_peg_values)
 # stitches live in the scene as invisible until needed
 for stitch in stitches:
     stitch.animation_data_clear()
+    stitch.data.materials[0].animation_data_clear()
     stitch.hide_viewport = True
     stitch.hide_render = True
     stitch.keyframe_insert(data_path="hide_viewport", frame=0)
     stitch.keyframe_insert("hide_render", frame=0)
+
+for peg in pegs + temp_pegs:
+    peg.animation_data_clear()
  
 #demo_3bit_cycle() 
-animate_carriage(34, 54, num_passes=5, frames_per_peg=5)
+animate_carriage(34, 54, num_passes=9, frames_per_peg=2)
