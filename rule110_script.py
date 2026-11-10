@@ -73,6 +73,7 @@ UpdaterRight.animation_data_clear()
 OutputActuatorCenter = bpy.data.objects.get("OutputActuatorCenter")
 UpdaterLeftCenter = bpy.data.objects.get("UpdaterLeftCenter")
 UpdaterRightCenter = bpy.data.objects.get("UpdaterRightCenter")
+StitchOutputLocationXZ = bpy.data.objects.get("StitchOutputLocationXZ")
 
 # rod positions that have hysteresis
 output1 = 0
@@ -88,16 +89,22 @@ temp_peg_values = [0] * num_pegs
 peg_radius = 0.095
 travel = 0.2  # how far the inputs move
 peg_separation = abs(pegs[1].matrix_world.translation[1] - pegs[0].matrix_world.translation[1])
+
 sensor_square_radius = travel / math.sqrt(2)  # distance from diamond center to edge midpoint
 
 correctors = [bpy.data.objects.get(f"Corrector{idx + 1}") for idx in range(4)]
 temp_correctors = [bpy.data.objects.get(f"TempCorrector{idx + 1}") for idx in range(2)]
 
-
 track_zero = bpy.data.objects.get("TrackZero").matrix_world.translation[0]
 track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
 temp_zero = bpy.data.objects.get("TempZero").matrix_world.translation[0]
 temp_one = bpy.data.objects.get("TempOne").matrix_world.translation[0]
+
+num_stitches = 200
+stitches = [bpy.data.objects.get(f"Stitch.{idx:03d}") for idx in range(num_stitches)]
+next_available_stitch = 0
+last_peg_stitched = -1
+stitch_size = 0.2
 
 
 def set_state(a, b, c, left, right, frame):
@@ -293,6 +300,7 @@ def sensor_x_to_value(x, is_temp=False):
         # print(f"In sensor_x_to_value({x}). zero_x = {zero_x}, one_x = {one_x}, returning {(x - zero_x) / (one_x - zero_x)}")
         return (x - zero_x) / (one_x - zero_x)
 
+
 def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
     "The carriage has moved sideways, what should this input rods new position be?"""
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
@@ -338,14 +346,33 @@ def get_new_input_position(peg, sensor, expected_travel, is_temp=False):
     return new_value"""
 
 
-def add_stitch_at_current_peg_if_needed(peg):
+def add_stitch_at_current_peg_if_needed(peg, frame):
+    global last_peg_stitched, next_available_stitch
     peg_idx = int(peg.name.split(".")[-1])
-    stitch = bpy.data.objects.get(f"Stitch.{peg_idx:03d}")
-    if not stitch:
-        return  # only a finite number of stitches are available
-    stitch.  TODO: actually need to keyframe the visibility for all stitches on every frame, as well as: inserting new ones, moving them all down at the end of each row
+    if last_peg_stitched == peg_idx:
+        print(f"Peg {peg_idx} already stitched.")
+        return  # we did this one already
+    stitch = stitches[next_available_stitch]
+    print(f"Stitching peg {peg_idx} with stitch {next_available_stitch} = {stitch.name}")
+    stitch.location[0] += StitchOutputLocationXZ.matrix_world.translation[0] - stitch.matrix_world.translation[0]
+    stitch.location[1] += peg.matrix_world.translation[1] - stitch.matrix_world.translation[1]
+    stitch.location[2] += StitchOutputLocationXZ.matrix_world.translation[2] - stitch.matrix_world.translation[2]
+    stitch.hide_viewport = False
+    stitch.hide_render = False
+    stitch.keyframe_insert(data_path="location", frame=frame, index=0)
+    stitch.keyframe_insert(data_path="location", frame=frame, index=1)
+    stitch.keyframe_insert(data_path="location", frame=frame, index=2)
+    stitch.keyframe_insert(data_path="hide_viewport", frame=frame)
+    stitch.keyframe_insert(data_path="hide_render", frame=frame)
+    last_peg_stitched = peg_idx    
+    next_available_stitch += 1
 
-    
+
+def move_stitches_down(frame):
+    for stitch in stitches[:next_available_stitch]:
+        stitch.location[2] += stitch_size * 2 
+        stitch.keyframe_insert(data_path="location", frame=frame, index=2)
+
 
 def set_carriage_state_from_pegs(frame, frames_per_peg):
     """Given the current position of the carriage and the input pegs, set the internal carriage state to match."""
@@ -369,7 +396,7 @@ def set_carriage_state_from_pegs(frame, frames_per_peg):
     right = get_new_input_position(pegRight, sensorRight, expected_travel, True)
     #print(f"Would set left = {left}, right = {right}")
     set_state(a, b, c, left, right, frame)
-    add_stitch_at_current_peg_if_needed(pegB)
+    add_stitch_at_current_peg_if_needed(pegB, frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     # print(f"After setting state got sensorC.matrix_world.translation[0] == {sensorC.matrix_world.translation[0]}")
 
@@ -467,6 +494,10 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
             set_carriage_state_from_pegs(frame, frames_per_peg)
             update_pegs(frame)
             frame += 1
+        # prepare for next pass
+        last_peg_stitched = -1
+        move_stitches_down(frame)
+
     # finally update the scene to the current frame
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
     print("Done")
@@ -480,5 +511,13 @@ peg_values[46] = 1  # the initial 1 in the rule110 input pattern
 #peg_values[50] = 1  # the initial 1 in the rule110 input pattern
 temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
 set_pegs(peg_values, temp_peg_values)
+
+# stitches live in the scene as invisible until needed
+for stitch in stitches:
+    stitch.hide_viewport = True
+    stitch.hide_render = True
+    stitch.keyframe_insert(data_path="hide_viewport", frame=0)
+    stitch.keyframe_insert("hide_render", frame=0)
+
 #demo_3bit_cycle() 
 animate_carriage(34, 54, num_passes=5, frames_per_peg=5)
