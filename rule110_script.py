@@ -450,6 +450,9 @@ def update_pegs(frame):
 def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20):
     global last_peg_stitched
     """peg_start and peg_end are indices of the peg to be at SensorB"""
+    total_number_of_stitches_produced = (abs(end_peg_idx - start_peg_idx) + 1) * num_passes
+    if total_number_of_stitches_produced > num_stitches:
+        raise RuntimeError(f"Too many stitches expected: {total_number_of_stitches_produced} > {num_stitches}")
     num_frames_per_pass = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
     num_frames = num_frames_per_pass * num_passes
     bpy.data.scenes[0].frame_start = 0
@@ -512,4 +515,4 @@ for stitch in stitches:
     stitch.keyframe_insert("hide_render", frame=0)
 
 #demo_3bit_cycle() 
-animate_carriage(34, 54, num_passes=7, frames_per_peg=2)
+animate_carriage(34, 49, num_passes=12, frames_per_peg=10)
