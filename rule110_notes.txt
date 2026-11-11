@@ -7,3 +7,35 @@ ABC ABC ABC ABC ABC ABC ABC ABC
 = (B XOR C) OR (notA AND B)
 
 Many other expressions are possible.
+
+Input and output rods have positions in [0,1].
+One rod pushes another: b = max(a, b)  [0 gears]
+One rod pulls another: b = min(a, b)   [0 gears]
+An anchored gear between two rods: b = 1 - a    [1 gear]
+A double gear with two rods on the same side: b = 2a    [1 gear with 2 radii]
+(or any fixed multiplier)
+Double rack with a pinion mounted on rod c: c = (a + b) / 2   [1 gear]
+Adding/subtracting a fixed value is free, just affects a rod's length.
+
+Chain:
+
+not_a = 1 - a
+not_b = 1 - b
+not_c = 1 - c
+f = (c + not_b) / 2
+g = f * 2 - 1 = c + not_b - 1 (using gear E)
+h = -g (using gear L)
+output1 = min(min(c, not_b), g)  # pushed forward by g, pulled back by c and not_b = c AND not_b
+output2 = min(min(not_c, b), h)  # pushed forward by h, pulled back by not_c and b = not_c AND b
+m = (b + not_a) / 2
+p = m * 2 - 1 (using gear N)
+j = (output1 + output2) / 2
+output3 = j * 2 = b XOR c (using gear K)
+output4 = min(min(b, not_a), p)  # pushed forward by p, pulled back by b and not_a = not_a AND b
+q = (output3 + output4) / 2
+t = q * 2 (using gear S)
+output5 = min(max(output3, output4), t)  # pulled back by t, pushed forward by output3 and ouput4
+        = (b XOR c) OR (not_a AND b) = rule110
+
+Total: 20 rods (a, b, c, not_a, not_b, not_c, f, g, h, output1, output2, m, p, j, output3, output4, q, t, r, output5)
+       12 gears (invert_A, invert_C, invert_C, F_gear, E, L, M_gear, N, J_gear, K, Q, S)
