@@ -504,11 +504,12 @@ set_pegs(peg_values, temp_peg_values)
 # stitches live in the scene as invisible until needed
 for stitch in stitches:
     stitch.animation_data_clear()
-    stitch.data.materials[0].animation_data_clear()
+    stitch.data.materials[0].animation_data_clear()  # clear the animation of the viewport color
+    stitch.data.materials[0].node_tree.animation_data_clear()  # clear the animation of the rendered color
     stitch.hide_viewport = True
     stitch.hide_render = True
     stitch.keyframe_insert(data_path="hide_viewport", frame=0)
     stitch.keyframe_insert("hide_render", frame=0)
 
 #demo_3bit_cycle() 
-animate_carriage(34, 54, num_passes=5, frames_per_peg=2)
+animate_carriage(34, 54, num_passes=9, frames_per_peg=2)
