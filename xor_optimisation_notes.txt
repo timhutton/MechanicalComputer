@@ -47,3 +47,5 @@ output3 = 2j
 Total: 11 rods (a, b, not_a, not_b, c, g, output1, h, output2, j, output3), 7 gears.
 
 Can we do better? Or prove this is optimal?
+
+Can save a gear by putting H on the other side of the double-gear that outputs G.

@@ -32,10 +32,12 @@ p = m * 2 - 1 (using gear N)
 j = (output1 + output2) / 2
 output3 = j * 2 = b XOR c (using gear K)
 output4 = min(min(b, not_a), p)  # pushed forward by p, pulled back by b and not_a = not_a AND b
-q = (output3 + output4) / 2
+q = (output3 + output4) / 2 (q is the gear, r is the rod)
 t = q * 2 (using gear S)
 output5 = min(max(output3, output4), t)  # pulled back by t, pushed forward by output3 and ouput4
         = (b XOR c) OR (not_a AND b) = rule110
 
 Total: 20 rods (a, b, c, not_a, not_b, not_c, f, g, h, output1, output2, m, p, j, output3, output4, q, t, r, output5)
        12 gears (invert_A, invert_C, invert_C, F_gear, E, L, M_gear, N, J_gear, K, Q, S)
+
+But can remove gear L if we put H on the other side of double gear E.
