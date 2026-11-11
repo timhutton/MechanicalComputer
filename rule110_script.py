@@ -329,7 +329,7 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
         return 
     stitch = stitches[next_available_stitch]
     stitch.location[0] = StitchOutputLocationXZ.matrix_world.translation[0]
-    stitch.location[1] = peg.matrix_world.translation[1]
+    stitch.location[1] = stitch.location[1] + peg.matrix_world.translation[1] - stitch.matrix_world.translation[1]
     stitch.location[2] = StitchOutputLocationXZ.matrix_world.translation[2]
     stitch.hide_viewport = False
     stitch.hide_render = False
