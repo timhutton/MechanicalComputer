@@ -448,6 +448,7 @@ def update_pegs(frame):
 
 
 def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20):
+    global last_peg_stitched
     """peg_start and peg_end are indices of the peg to be at SensorB"""
     num_frames_per_pass = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
     num_frames = num_frames_per_pass * num_passes
@@ -482,7 +483,6 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
         # prepare for next pass
         last_peg_stitched = -1
         move_stitches_down(frame)
-        # TODO: fix issue with an occasional dropped stitch at the end
 
     # finally update the scene to the current frame
     bpy.context.scene.frame_set(bpy.context.scene.frame_current)
@@ -512,4 +512,4 @@ for stitch in stitches:
     stitch.keyframe_insert("hide_render", frame=0)
 
 #demo_3bit_cycle() 
-animate_carriage(34, 54, num_passes=9, frames_per_peg=2)
+animate_carriage(34, 54, num_passes=7, frames_per_peg=2)
