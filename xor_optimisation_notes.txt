@@ -46,6 +46,18 @@ output3 = 2j
 
 Total: 11 rods (a, b, not_a, not_b, c, g, output1, h, output2, j, output3), 7 gears.
 
-Can we do better? Or prove this is optimal?
+Can save a gear by putting H on the other side of the double-gear that outputs G:
 
-Can save a gear by putting H on the other side of the double-gear that outputs G.
+The chain is now:
+
+not_b = 1 - b
+c = (a + not_b) / 2
+g = 2c - 1
+h = -g (using the opposite side of the gear to g)
+output1 = max(g, min(a, not_b))  [pushed by g, pulled by a and not_b]
+not_a = 1 - a
+output2 = max(h, min(not_a, b))  [pushed by h, pulled by not_a and b]
+j = (output1 + output2) / 2
+output3 = 2j
+
+Total: 11 rods (a, b, not_a, not_b, c, g, output1, h, output2, j, output3), 6 gears.

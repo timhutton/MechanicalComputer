@@ -31,8 +31,6 @@ Fgear = bpy.data.objects.get("F_gear")
 Fgear.animation_data_clear()
 E = bpy.data.objects.get("E")
 E.animation_data_clear()
-L = bpy.data.objects.get("L")
-L.animation_data_clear()
 G = bpy.data.objects.get("G")
 G.animation_data_clear()
 H = bpy.data.objects.get("H")
@@ -192,8 +190,6 @@ def set_state(a, b, c, left, right, frame):
     Jgear.keyframe_insert(data_path="rotation_euler", frame=frame)
     K.rotation_euler.y = -j * rotation_factor
     K.keyframe_insert(data_path="rotation_euler", frame=frame)
-    L.rotation_euler.y = (g - h) * rotation_factor / 4
-    L.keyframe_insert(data_path="rotation_euler", frame=frame)
     Output3.location[0] = output3_x_offset + output3 * travel
     Output3.keyframe_insert(data_path="location", frame=frame, index=0)
     M.location[0] = fm_x_offset + m * travel
@@ -243,7 +239,7 @@ def demo_3bit_cycle():
         for i in range(transition_frames):
             u = i / float(transition_frames-1)
             values = [int(old_inputs[j]) * (1-u) + int(inputs[j]) * u for j in range(3)]
-            set_state(*values, frame)
+            set_state(values[0], values[1], values[2], 0, 0, frame)
             frame += 1
         # a period of stasis
         values = [int(inputs[j]) for j in range(3)]
@@ -493,6 +489,9 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
 
 
 os.system("cls")
+
+for obj in bpy.context.scene.objects:
+    obj.animation_data_clear()
 
 bpy.context.scene.frame_set(0)
 

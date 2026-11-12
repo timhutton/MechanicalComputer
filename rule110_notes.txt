@@ -24,7 +24,7 @@ not_b = 1 - b
 not_c = 1 - c
 f = (c + not_b) / 2
 g = f * 2 - 1 = c + not_b - 1 (using gear E)
-h = -g (using gear L)
+h = -g (using the opposite side of gear E)
 output1 = min(min(c, not_b), g)  # pushed forward by g, pulled back by c and not_b = c AND not_b
 output2 = min(min(not_c, b), h)  # pushed forward by h, pulled back by not_c and b = not_c AND b
 m = (b + not_a) / 2
@@ -38,6 +38,4 @@ output5 = min(max(output3, output4), t)  # pulled back by t, pushed forward by o
         = (b XOR c) OR (not_a AND b) = rule110
 
 Total: 20 rods (a, b, c, not_a, not_b, not_c, f, g, h, output1, output2, m, p, j, output3, output4, q, t, r, output5)
-       12 gears (invert_A, invert_C, invert_C, F_gear, E, L, M_gear, N, J_gear, K, Q, S)
-
-But can remove gear L if we put H on the other side of double gear E.
+       11 gears (invert_A, invert_C, invert_C, F_gear, E, M_gear, N, J_gear, K, Q, S)
