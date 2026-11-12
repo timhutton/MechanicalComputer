@@ -116,7 +116,7 @@ def set_state(a, b, c, left, right, frame):
     fm_gear_x_offset = 0.0425
     gh_x_offset = 0.0
     output12_x_offset = 0.43
-    j_x_offset = 0.85  
+    j_x_offset = 0.85
     jgear_x_offset = 0.7
     output3_x_offset = 0.85
     p_x_offset = -0.124
@@ -147,7 +147,7 @@ def set_state(a, b, c, left, right, frame):
     t = q * 2
     output5 = min(t, output5)  # pulled back by t
     output5 = max(max(output3, output4), output5)  # pushed forward by output3 and ouput4
-    
+
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
     B.location[0] = input_x_offset + b * travel
@@ -322,7 +322,7 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=0)
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=1)
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=2)
-        return 
+        return
     stitch = stitches[next_available_stitch]
     stitch.location[0] = StitchOutputLocationXZ.matrix_world.translation[0]
     stitch.location[1] = stitch.location[1] + peg.matrix_world.translation[1] - stitch.matrix_world.translation[1]
@@ -344,14 +344,14 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
     stitch.keyframe_insert(data_path="hide_viewport", frame=frame)
     stitch.keyframe_insert(data_path="hide_render", frame=frame)
     stitches_on_peg[peg_idx].append(stitch)
-    last_peg_stitched = peg_idx    
+    last_peg_stitched = peg_idx
     next_available_stitch += 1
 
 
-def move_stitches_down(frame): 
+def move_stitches_down(frame):
     for stitch_list in stitches_on_peg:
         for stitch in stitch_list:
-            stitch.location[2] += stitch_size * 2 
+            stitch.location[2] += stitch_size * 2
             stitch.keyframe_insert(data_path="location", frame=frame, index=2)
 
 
@@ -513,5 +513,5 @@ for stitch in stitches:
     stitch.keyframe_insert(data_path="hide_viewport", frame=0)
     stitch.keyframe_insert("hide_render", frame=0)
 
-#demo_3bit_cycle() 
-animate_carriage(34, 49, num_passes=12, frames_per_peg=10)
+#demo_3bit_cycle()
+animate_carriage(32, 49, num_passes=11, frames_per_peg=10)
