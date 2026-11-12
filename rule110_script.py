@@ -507,14 +507,8 @@ set_pegs(peg_values, temp_peg_values)
 
 # stitches live in the scene as invisible until needed
 for stitch in stitches:
-    stitch.animation_data_clear()
     stitch.data.materials[0].animation_data_clear()  # clear the animation of the viewport color
     stitch.data.materials[0].node_tree.animation_data_clear()  # clear the animation of the rendered color
-    stitch.hide_viewport = True
-    stitch.hide_render = True
-    stitch.keyframe_insert(data_path="hide_viewport", frame=0)
-    stitch.keyframe_insert(data_path="hide_render", frame=0)
-
 
 frame = 0
 keyframe_visibility(track_things + stitches, is_hidden=True, frame=frame)
