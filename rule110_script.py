@@ -107,6 +107,12 @@ last_peg_stitched = -1
 stitch_size = 0.2
 stitches_on_peg = [[] for i in range(num_pegs)]
 
+peg_slots = [obj for obj in bpy.data.objects if obj.name.startswith("PegSlot")]
+correctors = [obj for obj in bpy.data.objects if "Corrector" in obj.name]
+updaters = [obj for obj in bpy.data.objects if "Updater" in obj.name or "Left" in obj.name or "Right" in obj.name]
+carriage_supports = bpy.data.objects.get("CarriageBody")
+track_things = pegs + temp_pegs + peg_slots + correctors + updaters + [carriage_supports]
+
 
 def set_state(a, b, c, left, right, frame):
     global output1, output2, output4, output5
@@ -116,7 +122,7 @@ def set_state(a, b, c, left, right, frame):
     fm_gear_x_offset = 0.0425
     gh_x_offset = 0.0
     output12_x_offset = 0.43
-    j_x_offset = 0.85
+    j_x_offset = 0.85  
     jgear_x_offset = 0.7
     output3_x_offset = 0.85
     p_x_offset = -0.124
@@ -147,7 +153,7 @@ def set_state(a, b, c, left, right, frame):
     t = q * 2
     output5 = min(t, output5)  # pulled back by t
     output5 = max(max(output3, output4), output5)  # pushed forward by output3 and ouput4
-
+    
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
     B.location[0] = input_x_offset + b * travel
@@ -225,6 +231,7 @@ def set_state(a, b, c, left, right, frame):
 
 
 def demo_3bit_cycle():
+    global frame
     # iterate the carriage through inputs abc: 000, 001, 010, ... , 110, 111, 000
     inputs_int = [0,1,2,3,4,5,6,7,0]
     inputs_bin = [format(v,'03b') for v in inputs_int]
@@ -232,7 +239,6 @@ def demo_3bit_cycle():
     transition_frames = 40
     static_frames = 10
 
-    frame = 0
     old_inputs = '000'
     for inputs in inputs_bin:
         # transition to the new input values
@@ -247,11 +253,6 @@ def demo_3bit_cycle():
             set_state(values[0], values[1], values[2], 0, 0, frame)
             frame += 1
         old_inputs = inputs
-
-    bpy.data.scenes[0].frame_start = 0
-    bpy.data.scenes[0].frame_end = frame - 1
-    # update the scene to the current frame
-    bpy.context.scene.frame_set(bpy.context.scene.frame_current)
 
 
 def set_pegs(peg_values, temp_peg_values):
@@ -322,7 +323,7 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=0)
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=1)
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=2)
-        return
+        return 
     stitch = stitches[next_available_stitch]
     stitch.location[0] = StitchOutputLocationXZ.matrix_world.translation[0]
     stitch.location[1] = stitch.location[1] + peg.matrix_world.translation[1] - stitch.matrix_world.translation[1]
@@ -344,14 +345,14 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
     stitch.keyframe_insert(data_path="hide_viewport", frame=frame)
     stitch.keyframe_insert(data_path="hide_render", frame=frame)
     stitches_on_peg[peg_idx].append(stitch)
-    last_peg_stitched = peg_idx
+    last_peg_stitched = peg_idx    
     next_available_stitch += 1
 
 
-def move_stitches_down(frame):
+def move_stitches_down(frame): 
     for stitch_list in stitches_on_peg:
         for stitch in stitch_list:
-            stitch.location[2] += stitch_size * 2
+            stitch.location[2] += stitch_size * 2 
             stitch.keyframe_insert(data_path="location", frame=frame, index=2)
 
 
@@ -444,15 +445,12 @@ def update_pegs(frame):
 
 
 def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20):
-    global last_peg_stitched
+    global frame, last_peg_stitched
     """peg_start and peg_end are indices of the peg to be at SensorB"""
     total_number_of_stitches_produced = (abs(end_peg_idx - start_peg_idx) + 1) * num_passes
     if total_number_of_stitches_produced > num_stitches:
         raise RuntimeError(f"Too many stitches expected: {total_number_of_stitches_produced} > {num_stitches}")
     num_frames_per_pass = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
-    num_frames = num_frames_per_pass * num_passes
-    bpy.data.scenes[0].frame_start = 0
-    bpy.data.scenes[0].frame_end = num_frames - 1
     start_peg = bpy.data.objects.get(f"Peg.{start_peg_idx:03d}")
     end_peg = bpy.data.objects.get(f"Peg.{end_peg_idx:03d}")
     # animate the carriage movement
@@ -464,10 +462,9 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
     # with current approach for pretend-physics we need to start the carriage in a valid (non-overlapping) state
     a = b = c = 0
     left = right = 0
-    set_state(a, b, c, left, right, 0)
+    set_state(a, b, c, left, right, frame)
     update_pegs(0)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
-    frame = 0
     for pass_idx in range(num_passes):
         for pass_frame in range(num_frames_per_pass):
             # print("\nSetting inputs for new carriage position.\n")
@@ -483,17 +480,22 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
         last_peg_stitched = -1
         move_stitches_down(frame)
 
-    # finally update the scene to the current frame
-    bpy.context.scene.frame_set(bpy.context.scene.frame_current)
-    print("Done")
 
+def keyframe_visibility(objects, is_hidden, frame):
+    for obj in objects:
+        obj.hide_viewport = is_hidden
+        obj.hide_render = is_hidden
+        obj.keyframe_insert(data_path="hide_viewport", frame=frame)
+        obj.keyframe_insert(data_path="hide_render", frame=frame)
+            
 
 os.system("cls")
 
-for obj in bpy.context.scene.objects:
+bpy.context.scene.frame_set(0)
+
+for obj in bpy.data.objects:
     obj.animation_data_clear()
 
-bpy.context.scene.frame_set(0)
 
 peg_values[46] = 1  # the initial 1 in the rule110 input pattern
 #peg_values[47] = 1  # the initial 1 in the rule110 input pattern
@@ -511,7 +513,15 @@ for stitch in stitches:
     stitch.hide_viewport = True
     stitch.hide_render = True
     stitch.keyframe_insert(data_path="hide_viewport", frame=0)
-    stitch.keyframe_insert("hide_render", frame=0)
+    stitch.keyframe_insert(data_path="hide_render", frame=0)
 
-#demo_3bit_cycle()
-animate_carriage(32, 49, num_passes=11, frames_per_peg=10)
+
+frame = 0
+keyframe_visibility(track_things + stitches, is_hidden=True, frame=frame)
+demo_3bit_cycle() 
+keyframe_visibility(track_things, is_hidden=False, frame=frame)
+animate_carriage(34, 49, num_passes=2, frames_per_peg=10)
+
+bpy.data.scenes[0].frame_start = 0
+bpy.data.scenes[0].frame_end = frame - 1
+bpy.context.scene.frame_set(0)
