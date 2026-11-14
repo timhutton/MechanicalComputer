@@ -27,7 +27,7 @@ And thus the Rule 110 Knitting Computer project was born.
 At each step the new value at a position is given by the current value and those of its neighbors:
 
 | Current pattern|111|110|101|100|011|010|001|000|
-|-
+|----|----|----|----|----|----|----|----|----|
 | New state for center cell|0|1|1|0|1|1|1|0|
 
 Starting from 000000010000000 (a single black cell) we get this pattern:
