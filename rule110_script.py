@@ -78,9 +78,11 @@ StitchOutputLocationXZ = bpy.data.objects.get("StitchOutputLocationXZ")
 sensorB = bpy.data.objects.get("SensorB")
 carriage = bpy.data.objects.get("Carriage")
 handles = [bpy.data.objects.get(f"Sensor{k}Handle") for k in ["A", "B", "C"]]  # for showing how sensors work
+sensor_labels = [bpy.data.objects.get(f"Label{k}") for k in ["A", "B", "C"]]
 input_beams = [bpy.data.objects.get("A_beam"), B, C]
 mechanism_parts = [notA, notB, notC, invertA, invertB, invertC, F, Fgear, E, G, H, Output1,
-    Output2, J, Jgear, K, Output3, M, Mgear, N, P, Output4, Q, R, S, T, Output5]
+    Output2, J, Jgear, K, Output3, M, Mgear, N, P, Output4, Q, R, S, T, Output5,
+    bpy.data.objects.get("OutputActuator")]
 
 # rod positions that have hysteresis
 output1 = 0
@@ -496,34 +498,37 @@ os.system("cls")
 
 bpy.context.scene.frame_set(0)
 
+# clear keyframes on everything
 for obj in bpy.data.objects:
     obj.animation_data_clear()
-
-peg_values[46] = 1  # the initial 1 in the rule110 input pattern
-#peg_values[47] = 1  # the initial 1 in the rule110 input pattern
-#peg_values[48] = 1  # the initial 1 in the rule110 input pattern
-#peg_values[49] = 1  # the initial 1 in the rule110 input pattern
-#peg_values[50] = 1  # the initial 1 in the rule110 input pattern
-temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
-set_pegs(peg_values, temp_peg_values)
-
-# stitches live in the scene as invisible until needed
+# also on those materials that are animated
 for stitch in stitches:
     stitch.data.materials[0].animation_data_clear()  # clear the animation of the viewport color
     stitch.data.materials[0].node_tree.animation_data_clear()  # clear the animation of the rendered color
+
+peg_values[46] = 1  # the initial 1 in the rule110 input pattern
+peg_values[42] = 1  # the initial 1 in the rule110 input pattern
+peg_values[41] = 1  # the initial 1 in the rule110 input pattern
+temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
+set_pegs(peg_values, temp_peg_values)
 
 frame = 0
 keyframe_pegs(frame)
 
 # show how the sensors work
-keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts, is_hidden=True, frame=frame)
+keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels, is_hidden=True, frame=frame)
 keyframe_visibility(track_things + handles, is_hidden=False, frame=frame)
 animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False)
 
 # show how the central mechanism works
 keyframe_visibility(track_things + carriage_stuff + stitches + handles, is_hidden=True, frame=frame)
-keyframe_visibility(input_beams + mechanism_parts, is_hidden=False, frame=frame)
+keyframe_visibility(sensor_labels + input_beams + mechanism_parts, is_hidden=False, frame=frame)
 demo_3bit_cycle() 
+
+peg_values = [0] * num_pegs
+peg_values[46] = 1  # the initial 1 in the rule110 input pattern
+temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
+set_pegs(peg_values, temp_peg_values)
 
 # show the whole system in action
 keyframe_visibility(track_things + carriage_stuff, is_hidden=False, frame=frame)
