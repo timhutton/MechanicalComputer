@@ -46,6 +46,9 @@ These pegs are designed to have a little friction, so that they don't vibrate ou
 
 The pegs are designed to work together with the sensors, which are little diamond shapes attached to rods. They translate the 0,1 position of a peg into a pushing motion of the rod.
 
+https://github.com/user-attachments/assets/a61cf8b2-bdf8-4a0e-8b16-e914046d93ee
+
+
 <video width="400" controls>
   <source src="media/rule110_sensors.mp4" type="video/mp4">
   Your browser does not support HTML video.
