@@ -118,12 +118,14 @@ last_peg_stitched = -1
 stitch_size = 0.2
 stitches_on_peg = [[] for i in range(num_pegs)]
 
-peg_slots = [obj for obj in bpy.data.objects if obj.name.startswith("PegSlot")]
+peg_slots = [bpy.data.objects.get(f"PegSlot.{idx:03d}") for idx in range(num_pegs)]
+temp_peg_slots = [bpy.data.objects.get(f"PegSlot.{idx:03d}") for idx in range(num_pegs, num_pegs*2)]
 correctors = [obj for obj in bpy.data.objects if "Corrector" in obj.name]
 updaters = [obj for obj in bpy.data.objects if "Updater" in obj.name or "Left" in obj.name or "Right" in obj.name]
 carriage_supports = bpy.data.objects.get("CarriageBody")
 carriage_stuff = correctors + updaters + [carriage_supports]
-track_things = pegs + temp_pegs + peg_slots
+track_things = pegs + peg_slots
+temp_track_things = temp_pegs + temp_peg_slots
 
 
 def set_state(a, b, c, left, right, frame):
@@ -519,7 +521,7 @@ frame = 0
 keyframe_pegs(frame)
 
 # show how a single sensor worka
-keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels + sensorsAC + handlesAC, is_hidden=True, frame=frame)
+keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels + sensorsAC + handlesAC + temp_track_things, is_hidden=True, frame=frame)
 keyframe_visibility(track_things + handlesB, is_hidden=False, frame=frame)
 animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False)
 
@@ -533,6 +535,7 @@ keyframe_visibility(track_things + carriage_stuff + stitches + handles, is_hidde
 keyframe_visibility(sensorsAC + sensor_labels + input_beams + mechanism_parts, is_hidden=False, frame=frame)
 demo_3bit_cycle() 
 
+# show the whole system in action
 keyframe_pegs(frame - 1)  # should probably get used to keyframing everything on every frame even where unmoved and not visible
 
 peg_values = [0] * num_pegs
@@ -540,8 +543,7 @@ peg_values[46] = 1  # the initial 1 in the rule110 input pattern
 temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
 set_pegs(peg_values, temp_peg_values)
 
-# show the whole system in action
-keyframe_visibility(track_things + carriage_stuff, is_hidden=False, frame=frame)
+keyframe_visibility(track_things + carriage_stuff + temp_track_things, is_hidden=False, frame=frame)
 keyframe_pegs(frame)
 animate_carriage(34, 51, num_passes=2, frames_per_peg=10, move_pegs=True)
 
