@@ -50,7 +50,9 @@ https://github.com/user-attachments/assets/a61cf8b2-bdf8-4a0e-8b16-e914046d93ee
 
 <i>Video: An animation of sensors moving past fixed pegs. Firstly one sensor, then a group of three sensors reading from three neighboring pegs.</i>
 
-The sensors should work whichever position the peg is in. The pegs cannot move beyond their end stops, which gives the sensors something to push against.
+The sensors should work whichever position the peg is in. The pegs cannot move beyond their end stops, which gives the sensors something to push against. Note that the sensors don't normally alter the peg positions.
+
+If the pegs are slightly out of position then the sensors will nudge them back. If the pegs are dramatically out of position then the sensor could go to the wrong side, or get jammed.
 
 ### Logic components:
 
