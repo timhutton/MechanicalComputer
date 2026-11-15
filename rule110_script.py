@@ -83,6 +83,9 @@ input_beams = [bpy.data.objects.get("A_beam"), B, C]
 mechanism_parts = [notA, notB, notC, invertA, invertB, invertC, F, Fgear, E, G, H, Output1,
     Output2, J, Jgear, K, Output3, M, Mgear, N, P, Output4, Q, R, S, T, Output5,
     bpy.data.objects.get("OutputActuator")]
+sensorsAC = [bpy.data.objects.get("SensorA"), bpy.data.objects.get("SensorC")]
+handlesAC = [bpy.data.objects.get(f"Sensor{k}Handle") for k in ["A", "C"]]
+handlesB = [bpy.data.objects.get(f"SensorBHandle")]
 
 # rod positions that have hysteresis
 output1 = 0
@@ -515,15 +518,22 @@ set_pegs(peg_values, temp_peg_values)
 frame = 0
 keyframe_pegs(frame)
 
-# show how the sensors work
-keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels, is_hidden=True, frame=frame)
-keyframe_visibility(track_things + handles, is_hidden=False, frame=frame)
+# show how a single sensor worka
+keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels + sensorsAC + handlesAC, is_hidden=True, frame=frame)
+keyframe_visibility(track_things + handlesB, is_hidden=False, frame=frame)
+animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False)
+
+# show how three sensors work
+keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts, is_hidden=True, frame=frame)
+keyframe_visibility(track_things + handles + sensor_labels + sensorsAC, is_hidden=False, frame=frame)
 animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False)
 
 # show how the central mechanism works
 keyframe_visibility(track_things + carriage_stuff + stitches + handles, is_hidden=True, frame=frame)
-keyframe_visibility(sensor_labels + input_beams + mechanism_parts, is_hidden=False, frame=frame)
+keyframe_visibility(sensorsAC + sensor_labels + input_beams + mechanism_parts, is_hidden=False, frame=frame)
 demo_3bit_cycle() 
+
+keyframe_pegs(frame - 1)  # should probably get used to keyframing everything on every frame even where unmoved and not visible
 
 peg_values = [0] * num_pegs
 peg_values[46] = 1  # the initial 1 in the rule110 input pattern
@@ -533,7 +543,7 @@ set_pegs(peg_values, temp_peg_values)
 # show the whole system in action
 keyframe_visibility(track_things + carriage_stuff, is_hidden=False, frame=frame)
 keyframe_pegs(frame)
-animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=True)
+animate_carriage(34, 51, num_passes=2, frames_per_peg=10, move_pegs=True)
 
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = frame - 1
