@@ -75,6 +75,8 @@ OutputActuatorCenter = bpy.data.objects.get("OutputActuatorCenter")
 UpdaterLeftCenter = bpy.data.objects.get("UpdaterLeftCenter")
 UpdaterRightCenter = bpy.data.objects.get("UpdaterRightCenter")
 StitchOutputLocationXZ = bpy.data.objects.get("StitchOutputLocationXZ")
+sensorB = bpy.data.objects.get("SensorB")
+carriage = bpy.data.objects.get("Carriage")
 
 # rod positions that have hysteresis
 output1 = 0
@@ -111,7 +113,8 @@ peg_slots = [obj for obj in bpy.data.objects if obj.name.startswith("PegSlot")]
 correctors = [obj for obj in bpy.data.objects if "Corrector" in obj.name]
 updaters = [obj for obj in bpy.data.objects if "Updater" in obj.name or "Left" in obj.name or "Right" in obj.name]
 carriage_supports = bpy.data.objects.get("CarriageBody")
-track_things = pegs + temp_pegs + peg_slots + correctors + updaters + [carriage_supports]
+carriage_stuff = correctors + updaters + [carriage_supports]
+track_things = pegs + temp_pegs + peg_slots
 
 
 def set_state(a, b, c, left, right, frame):
@@ -258,10 +261,8 @@ def demo_3bit_cycle():
 def set_pegs(peg_values, temp_peg_values):
     """Move each peg to a the specified position in [0, 1]."""
     for peg, peg_value in zip(pegs, peg_values):
-        peg.animation_data_clear()
         peg.location[0] = track_zero + (track_one - track_zero) * peg_value
     for peg, peg_value in zip(temp_pegs, temp_peg_values):
-        peg.animation_data_clear()
         peg.location[0] = temp_zero + (temp_one - temp_zero) * peg_value
 
 
@@ -444,7 +445,7 @@ def update_pegs(frame):
     keyframe_pegs(frame)
 
 
-def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20):
+def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20, move_pegs=True):
     global frame, last_peg_stitched
     """peg_start and peg_end are indices of the peg to be at SensorB"""
     total_number_of_stitches_produced = (abs(end_peg_idx - start_peg_idx) + 1) * num_passes
@@ -454,16 +455,13 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
     start_peg = bpy.data.objects.get(f"Peg.{start_peg_idx:03d}")
     end_peg = bpy.data.objects.get(f"Peg.{end_peg_idx:03d}")
     # animate the carriage movement
-    carriage = bpy.data.objects.get("Carriage")
-    carriage.animation_data_clear()
-    sensorB = bpy.data.objects.get("SensorB")
-    sensorB.animation_data_clear()
     carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
     # with current approach for pretend-physics we need to start the carriage in a valid (non-overlapping) state
     a = b = c = 0
     left = right = 0
     set_state(a, b, c, left, right, frame)
-    update_pegs(0)
+    if move_pegs:
+        update_pegs(frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     for pass_idx in range(num_passes):
         for pass_frame in range(num_frames_per_pass):
@@ -474,7 +472,8 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
                 carriage.location[1] = carriage_offset + end_peg.matrix_world.translation[1] + (start_peg.matrix_world.translation[1] - end_peg.matrix_world.translation[1]) * pass_frame / (num_frames_per_pass - 1)
             carriage.keyframe_insert(data_path="location", frame=frame, index=1)
             set_carriage_state_from_pegs(frame, frames_per_peg)
-            update_pegs(frame)
+            if move_pegs:
+                update_pegs(frame)
             frame += 1
         # prepare for next pass
         last_peg_stitched = -1
@@ -496,7 +495,6 @@ bpy.context.scene.frame_set(0)
 for obj in bpy.data.objects:
     obj.animation_data_clear()
 
-
 peg_values[46] = 1  # the initial 1 in the rule110 input pattern
 #peg_values[47] = 1  # the initial 1 in the rule110 input pattern
 #peg_values[48] = 1  # the initial 1 in the rule110 input pattern
@@ -511,10 +509,14 @@ for stitch in stitches:
     stitch.data.materials[0].node_tree.animation_data_clear()  # clear the animation of the rendered color
 
 frame = 0
-keyframe_visibility(track_things + stitches, is_hidden=True, frame=frame)
-demo_3bit_cycle() 
+keyframe_pegs(frame)
+keyframe_visibility(carriage_stuff + stitches, is_hidden=True, frame=frame)
 keyframe_visibility(track_things, is_hidden=False, frame=frame)
-animate_carriage(34, 49, num_passes=2, frames_per_peg=10)
+animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False)
+keyframe_visibility(track_things + carriage_stuff + stitches, is_hidden=True, frame=frame)
+demo_3bit_cycle() 
+keyframe_visibility(track_things + carriage_stuff, is_hidden=False, frame=frame)
+animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=True)
 
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = frame - 1
