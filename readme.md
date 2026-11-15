@@ -44,6 +44,16 @@ These pegs are designed to have a little friction, so that they don't vibrate ou
 
 ### Sensors:
 
+The pegs are designed to work together with the sensors, which are little diamond shapes attached to rods. They translate the 0,1 position of a peg into a pushing motion of the rod.
+
+<video width="400" controls>
+  <source src="media/rule110_sensors.mp4" type="video/mp4">
+  Your browser does not support HTML video.
+</video>
+<i>Video: An animation of sensors moving past fixed pegs. Firstly one sensor, then a group of three sensors reading from three neighboring pegs.</i>
+
+The sensors should work whichever position the peg is in. The pegs cannot move beyond their end stops, which gives the sensors something to push against.
+
 ### Logic components:
 
 ### Actuators:
