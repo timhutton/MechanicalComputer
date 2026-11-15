@@ -44,7 +44,7 @@ These pegs are designed to have a little friction, so that they don't vibrate ou
 
 ### Sensors:
 
-The pegs are designed to work together with the sensors, which are little diamond shapes attached to rods. They translate the 0,1 position of a peg into a pushing motion of the rod.
+The pegs are designed to work together with the sensors, which are little diamond shapes attached to rods. The rods are constrained to only move along their length, so as the carriage comes along the sensors translate the 0,1 position of a peg into a vertical motion of the rod.
 
 https://github.com/user-attachments/assets/a61cf8b2-bdf8-4a0e-8b16-e914046d93ee
 
