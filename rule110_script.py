@@ -364,7 +364,7 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
 def move_stitches_down(frame): 
     for stitch_list in stitches_on_peg:
         for stitch in stitch_list:
-            stitch.location[2] += stitch_size * 2 
+            stitch.location[2] -= stitch_size * 2  # (possibly a non-traditional value of down)
             stitch.keyframe_insert(data_path="location", frame=frame, index=2)
 
 
