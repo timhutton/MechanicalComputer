@@ -47,6 +47,7 @@ These pegs are designed to have a little friction, so that they don't vibrate ou
 The pegs are designed to work together with the sensors, which are little diamond shapes attached to rods. They translate the 0,1 position of a peg into a pushing motion of the rod.
 
 https://github.com/user-attachments/assets/a61cf8b2-bdf8-4a0e-8b16-e914046d93ee
+
 <i>Video: An animation of sensors moving past fixed pegs. Firstly one sensor, then a group of three sensors reading from three neighboring pegs.</i>
 
 The sensors should work whichever position the peg is in. The pegs cannot move beyond their end stops, which gives the sensors something to push against.
