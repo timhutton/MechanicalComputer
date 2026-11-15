@@ -77,6 +77,10 @@ UpdaterRightCenter = bpy.data.objects.get("UpdaterRightCenter")
 StitchOutputLocationXZ = bpy.data.objects.get("StitchOutputLocationXZ")
 sensorB = bpy.data.objects.get("SensorB")
 carriage = bpy.data.objects.get("Carriage")
+handles = [bpy.data.objects.get(f"Sensor{k}Handle") for k in ["A", "B", "C"]]  # for showing how sensors work
+input_beams = [bpy.data.objects.get("A_beam"), B, C]
+mechanism_parts = [notA, notB, notC, invertA, invertB, invertC, F, Fgear, E, G, H, Output1,
+    Output2, J, Jgear, K, Output3, M, Mgear, N, P, Output4, Q, R, S, T, Output5]
 
 # rod positions that have hysteresis
 output1 = 0
@@ -510,12 +514,20 @@ for stitch in stitches:
 
 frame = 0
 keyframe_pegs(frame)
-keyframe_visibility(carriage_stuff + stitches, is_hidden=True, frame=frame)
-keyframe_visibility(track_things, is_hidden=False, frame=frame)
+
+# show how the sensors work
+keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts, is_hidden=True, frame=frame)
+keyframe_visibility(track_things + handles, is_hidden=False, frame=frame)
 animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False)
-keyframe_visibility(track_things + carriage_stuff + stitches, is_hidden=True, frame=frame)
+
+# show how the central mechanism works
+keyframe_visibility(track_things + carriage_stuff + stitches + handles, is_hidden=True, frame=frame)
+keyframe_visibility(input_beams + mechanism_parts, is_hidden=False, frame=frame)
 demo_3bit_cycle() 
+
+# show the whole system in action
 keyframe_visibility(track_things + carriage_stuff, is_hidden=False, frame=frame)
+keyframe_pegs(frame)
 animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=True)
 
 bpy.data.scenes[0].frame_start = 0
