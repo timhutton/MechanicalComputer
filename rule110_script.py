@@ -123,7 +123,8 @@ temp_peg_slots = [bpy.data.objects.get(f"PegSlot.{idx:03d}") for idx in range(nu
 correctors = [obj for obj in bpy.data.objects if "Corrector" in obj.name]
 updaters = [obj for obj in bpy.data.objects if "Updater" in obj.name or "Left" in obj.name or "Right" in obj.name]
 carriage_supports = bpy.data.objects.get("CarriageBody")
-carriage_stuff = correctors + updaters + [carriage_supports]
+yarn_selector = bpy.data.objects.get("YarnSelector")
+carriage_stuff = correctors + updaters + [carriage_supports, yarn_selector]
 track_things = pegs + peg_slots
 temp_track_things = temp_pegs + temp_peg_slots
 
@@ -547,7 +548,7 @@ set_pegs(peg_values, temp_peg_values)
 
 keyframe_visibility(track_things + carriage_stuff + temp_track_things, is_hidden=False, frame=frame)
 keyframe_pegs(frame)
-animate_carriage(34, 53, num_passes=2, frames_per_peg=10, move_pegs=True, add_stitches=True)
+animate_carriage(34, 53, num_passes=4, frames_per_peg=5, move_pegs=True, add_stitches=True)
 
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = frame - 1
