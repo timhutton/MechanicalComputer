@@ -80,9 +80,10 @@ carriage = bpy.data.objects.get("Carriage")
 handles = [bpy.data.objects.get(f"Sensor{k}Handle") for k in ["A", "B", "C"]]  # for showing how sensors work
 sensor_labels = [bpy.data.objects.get(f"Label{k}") for k in ["A", "B", "C"]]
 input_beams = [bpy.data.objects.get("A_beam"), B, C]
+OutputActuator = bpy.data.objects.get("OutputActuator")
 mechanism_parts = [notA, notB, notC, invertA, invertB, invertC, F, Fgear, E, G, H, Output1,
     Output2, J, Jgear, K, Output3, M, Mgear, N, P, Output4, Q, R, S, T, Output5,
-    bpy.data.objects.get("OutputActuator")]
+    OutputActuator]
 sensorsAC = [bpy.data.objects.get("SensorA"), bpy.data.objects.get("SensorC")]
 handlesAC = [bpy.data.objects.get(f"Sensor{k}Handle") for k in ["A", "C"]]
 handlesB = [bpy.data.objects.get(f"SensorBHandle")]
@@ -534,12 +535,20 @@ if False:
 # show how the central mechanism works
 always_visible = [sensorB] + sensorsAC + sensor_labels + input_beams
 always_invisible = track_things + carriage_stuff + stitches + handles
-becoming_visible = [[], [invertC, notC], [invertA, notA, invertB, notB]]
+becoming_visible = [[], [invertB, notB], [F, Fgear], [E, G], [Output1], [H, invertC, notC], [Output2], [J, Jgear], [K, Output3],
+    [invertA, notA], [M, Mgear], [N, P], [Output4], [Q, R], [S, T], [Output5]]
 keyframe_visibility(always_invisible + mechanism_parts, is_hidden=True, frame=frame)
 keyframe_visibility(always_visible, is_hidden=False, frame=frame)
 for item_list in becoming_visible:
     keyframe_visibility(item_list, is_hidden=False, frame=frame)
     demo_3bit_cycle(20, 5) 
+    
+# TODO: show system pushing pegs on temp track but without updaters (explain that cannot write back to main track immediately)
+# TODO: explain how actuators (+correctors) work
+# TODO: explain that temp track pegs are inverted (but not to worry for now)
+# TODO: show mechanism with a trailing updater, copying new valayes back onto the main track
+# TODO: show mechanism with both updaters, iteratively running the rule 110 CA
+# TODO: show where yarn selector is attached and how stitches are produced
 
 if False:
     # show the whole system in action
