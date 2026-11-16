@@ -245,15 +245,11 @@ def set_state(a, b, c, left, right, frame):
     UpdaterRight.keyframe_insert(data_path="location", frame=frame, index=0)
 
 
-def demo_3bit_cycle():
+def demo_3bit_cycle(transition_frames=40, static_frames=10):
     global frame
     # iterate the carriage through inputs abc: 000, 001, 010, ... , 110, 111, 000
     inputs_int = [0,1,2,3,4,5,6,7,0]
     inputs_bin = [format(v,'03b') for v in inputs_int]
-
-    transition_frames = 40
-    static_frames = 10
-
     old_inputs = '000'
     for inputs in inputs_bin:
         # transition to the new input values
@@ -523,32 +519,40 @@ set_pegs(peg_values, temp_peg_values)
 frame = 0
 keyframe_pegs(frame)
 
-# show how a single sensor worka
-keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels + sensorsAC + handlesAC + temp_track_things, is_hidden=True, frame=frame)
-keyframe_visibility(track_things + handlesB, is_hidden=False, frame=frame)
-animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False, add_stitches=False)
+if False:
+    # show how a single sensor worka
+    keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels + sensorsAC + handlesAC + temp_track_things, is_hidden=True, frame=frame)
+    keyframe_visibility(track_things + handlesB, is_hidden=False, frame=frame)
+    animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False, add_stitches=False)
 
-# show how three sensors work
-keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts, is_hidden=True, frame=frame)
-keyframe_visibility(track_things + handles + sensor_labels + sensorsAC, is_hidden=False, frame=frame)
-animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False, add_stitches=False)
+if False:
+    # show how three sensors work
+    keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts, is_hidden=True, frame=frame)
+    keyframe_visibility(track_things + handles + sensor_labels + sensorsAC, is_hidden=False, frame=frame)
+    animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False, add_stitches=False)
 
 # show how the central mechanism works
-keyframe_visibility(track_things + carriage_stuff + stitches + handles, is_hidden=True, frame=frame)
-keyframe_visibility(sensorsAC + sensor_labels + input_beams + mechanism_parts, is_hidden=False, frame=frame)
-demo_3bit_cycle() 
+always_visible = [sensorB] + sensorsAC + sensor_labels + input_beams
+always_invisible = track_things + carriage_stuff + stitches + handles
+becoming_visible = [[], [invertC, notC], [invertA, notA, invertB, notB]]
+keyframe_visibility(always_invisible + mechanism_parts, is_hidden=True, frame=frame)
+keyframe_visibility(always_visible, is_hidden=False, frame=frame)
+for item_list in becoming_visible:
+    keyframe_visibility(item_list, is_hidden=False, frame=frame)
+    demo_3bit_cycle(20, 5) 
 
-# show the whole system in action
-keyframe_pegs(frame - 1)  # should probably get used to keyframing everything on every frame even where unmoved and not visible
+if False:
+    # show the whole system in action
+    keyframe_pegs(frame - 1)  # should probably get used to keyframing everything on every frame even where unmoved and not visible
 
-peg_values = [0] * num_pegs
-peg_values[46] = 1  # the initial 1 in the rule110 input pattern
-temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
-set_pegs(peg_values, temp_peg_values)
+    peg_values = [0] * num_pegs
+    peg_values[46] = 1  # the initial 1 in the rule110 input pattern
+    temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
+    set_pegs(peg_values, temp_peg_values)
 
-keyframe_visibility(track_things + carriage_stuff + temp_track_things, is_hidden=False, frame=frame)
-keyframe_pegs(frame)
-animate_carriage(34, 53, num_passes=4, frames_per_peg=5, move_pegs=True, add_stitches=True)
+    keyframe_visibility(track_things + carriage_stuff + temp_track_things, is_hidden=False, frame=frame)
+    keyframe_pegs(frame)
+    animate_carriage(34, 53, num_passes=4, frames_per_peg=5, move_pegs=True, add_stitches=True)
 
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = frame - 1
