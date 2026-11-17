@@ -455,13 +455,9 @@ def update_pegs(frame):
     keyframe_pegs(frame)
 
 
-def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20, move_pegs=True, add_stitches=True):
+def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=[20], move_pegs=True, add_stitches=True):
     global frame, last_peg_stitched
     """peg_start and peg_end are indices of the peg to be at SensorB"""
-    total_number_of_stitches_produced = (abs(end_peg_idx - start_peg_idx) + 1) * num_passes
-    if total_number_of_stitches_produced > num_stitches:
-        raise RuntimeError(f"Too many stitches expected: {total_number_of_stitches_produced} > {num_stitches}")
-    num_frames_per_pass = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
     start_peg = pegs[start_peg_idx]
     end_peg = pegs[end_peg_idx]
     # animate the carriage movement
@@ -474,6 +470,8 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
         update_pegs(frame)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
     for pass_idx in range(num_passes):
+        num_frames_per_peg_in_this_pass = frames_per_peg[min(pass_idx, len(frames_per_peg) - 1)]
+        num_frames_per_pass = abs(end_peg_idx - start_peg_idx) * num_frames_per_peg_in_this_pass + 1
         for pass_frame in range(num_frames_per_pass):
             # print("\nSetting inputs for new carriage position.\n")
             if (pass_idx % 2) == 0:
@@ -481,7 +479,7 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
             else:
                 carriage.location[1] = carriage_offset + end_peg.matrix_world.translation[1] + (start_peg.matrix_world.translation[1] - end_peg.matrix_world.translation[1]) * pass_frame / (num_frames_per_pass - 1)
             carriage.keyframe_insert(data_path="location", frame=frame, index=1)
-            set_carriage_state_from_pegs(frame, frames_per_peg, add_stitches)
+            set_carriage_state_from_pegs(frame, num_frames_per_peg_in_this_pass, add_stitches)
             if move_pegs:
                 update_pegs(frame)
             frame += 1
@@ -503,8 +501,10 @@ os.system("cls")
 
 bpy.context.scene.frame_set(0)
 
-# clear keyframes on everything
+# clear keyframes on everything except the camera
 for obj in bpy.data.objects:
+    if obj.name == "Camera":
+        continue
     obj.animation_data_clear()
 # also on those materials that are animated
 for i, stitch in enumerate(stitches):
@@ -529,13 +529,13 @@ if True:
     # show how a single sensor worka
     keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels + sensorsAC + handlesAC + temp_track_things, is_hidden=True, frame=frame)
     keyframe_visibility(track_things + handlesB, is_hidden=False, frame=frame)
-    animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False, add_stitches=False)
+    animate_carriage(34, 49, num_passes=2, frames_per_peg=[10], move_pegs=False, add_stitches=False)
 
 if True:
     # show how three sensors work
     keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts, is_hidden=True, frame=frame)
     keyframe_visibility(track_things + handles + sensor_labels + sensorsAC, is_hidden=False, frame=frame)
-    animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False, add_stitches=False)
+    animate_carriage(34, 49, num_passes=2, frames_per_peg=[10], move_pegs=False, add_stitches=False)
 
 if True:
     # show how the central mechanism works
@@ -568,7 +568,7 @@ if True:
 
     keyframe_visibility(track_things + carriage_stuff + temp_track_things, is_hidden=False, frame=frame)
     keyframe_pegs(frame)
-    animate_carriage(29, 53, num_passes=15, frames_per_peg=5, move_pegs=True, add_stitches=True)
+    animate_carriage(29, 53, num_passes=15, frames_per_peg=[10,9,8,6,5,4,3,2,1], move_pegs=True, add_stitches=True)
 
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = frame - 1
