@@ -566,7 +566,7 @@ if True:
     temp_peg_values = [v for v in peg_values]  # keep it in sync with the main tape
     set_pegs(peg_values, temp_peg_values)
 
-    keyframe_visibility(track_things + carriage_stuff + temp_track_things, is_hidden=False, frame=frame)
+    keyframe_visibility(track_things + carriage_stuff + temp_track_things + mechanism_parts, is_hidden=False, frame=frame)
     keyframe_pegs(frame)
     animate_carriage(29, 53, num_passes=15, frames_per_peg=[10,9,8,6,5,4,3,2,1], move_pegs=True, add_stitches=True)
 
