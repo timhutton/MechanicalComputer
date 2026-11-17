@@ -112,7 +112,7 @@ track_one = bpy.data.objects.get("TrackOne").matrix_world.translation[0]
 temp_zero = bpy.data.objects.get("TempZero").matrix_world.translation[0]
 temp_one = bpy.data.objects.get("TempOne").matrix_world.translation[0]
 
-num_stitches = 200
+num_stitches = 500
 stitches = [bpy.data.objects.get(f"Stitch.{idx:03d}") for idx in range(num_stitches)]
 next_available_stitch = 0
 last_peg_stitched = -1
@@ -507,7 +507,12 @@ bpy.context.scene.frame_set(0)
 for obj in bpy.data.objects:
     obj.animation_data_clear()
 # also on those materials that are animated
-for stitch in stitches:
+for i, stitch in enumerate(stitches):
+    if False:  # give each stitch a unique material (only need to do this once) 
+        stitch.data.materials.clear()
+        new_mat = bpy.data.materials.new(f"StitchMaterial.{i:03d}")
+        stitch.data.materials.append(new_mat)
+        stitch.active_material_index = 0
     stitch.data.materials[0].animation_data_clear()  # clear the animation of the viewport color
     stitch.data.materials[0].node_tree.animation_data_clear()  # clear the animation of the rendered color
 
@@ -520,29 +525,30 @@ set_pegs(peg_values, temp_peg_values)
 frame = 0
 keyframe_pegs(frame)
 
-if False:
+if True:
     # show how a single sensor worka
     keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts + sensor_labels + sensorsAC + handlesAC + temp_track_things, is_hidden=True, frame=frame)
     keyframe_visibility(track_things + handlesB, is_hidden=False, frame=frame)
     animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False, add_stitches=False)
 
-if False:
+if True:
     # show how three sensors work
     keyframe_visibility(carriage_stuff + stitches + input_beams + mechanism_parts, is_hidden=True, frame=frame)
     keyframe_visibility(track_things + handles + sensor_labels + sensorsAC, is_hidden=False, frame=frame)
     animate_carriage(34, 49, num_passes=2, frames_per_peg=10, move_pegs=False, add_stitches=False)
 
-# show how the central mechanism works
-always_visible = [sensorB] + sensorsAC + sensor_labels + input_beams
-always_invisible = track_things + carriage_stuff + stitches + handles
-becoming_visible = [[], [invertB, notB], [F, Fgear], [E, G], [Output1], [H, invertC, notC], [Output2], [J, Jgear], [K, Output3],
-    [invertA, notA], [M, Mgear], [N, P], [Output4], [Q, R], [S, T], [Output5]]
-keyframe_visibility(always_invisible + mechanism_parts, is_hidden=True, frame=frame)
-keyframe_visibility(always_visible, is_hidden=False, frame=frame)
-for item_list in becoming_visible:
-    keyframe_visibility(item_list, is_hidden=False, frame=frame)
-    demo_3bit_cycle(20, 5) 
-    
+if True:
+    # show how the central mechanism works
+    always_visible = [sensorB] + sensorsAC + sensor_labels + input_beams
+    always_invisible = track_things + carriage_stuff + stitches + handles
+    becoming_visible = [[], [invertB, notB], [F, Fgear], [E, G], [Output1], [H, invertC, notC], [Output2], [J, Jgear], [K, Output3],
+        [invertA, notA], [M, Mgear], [N, P], [Output4], [Q, R], [S, T], [Output5]]
+    keyframe_visibility(always_invisible + mechanism_parts, is_hidden=True, frame=frame)
+    keyframe_visibility(always_visible, is_hidden=False, frame=frame)
+    for item_list in becoming_visible:
+        keyframe_visibility(item_list, is_hidden=False, frame=frame)
+        demo_3bit_cycle(20, 5) 
+        
 # TODO: show system pushing pegs on temp track but without updaters (explain that cannot write back to main track immediately)
 # TODO: explain how actuators (+correctors) work
 # TODO: explain that temp track pegs are inverted (but not to worry for now)
@@ -550,7 +556,7 @@ for item_list in becoming_visible:
 # TODO: show mechanism with both updaters, iteratively running the rule 110 CA
 # TODO: show where yarn selector is attached and how stitches are produced
 
-if False:
+if True:
     # show the whole system in action
     keyframe_pegs(frame - 1)  # should probably get used to keyframing everything on every frame even where unmoved and not visible
 
@@ -561,7 +567,7 @@ if False:
 
     keyframe_visibility(track_things + carriage_stuff + temp_track_things, is_hidden=False, frame=frame)
     keyframe_pegs(frame)
-    animate_carriage(34, 53, num_passes=4, frames_per_peg=5, move_pegs=True, add_stitches=True)
+    animate_carriage(24, 53, num_passes=15, frames_per_peg=5, move_pegs=True, add_stitches=True)
 
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = frame - 1
