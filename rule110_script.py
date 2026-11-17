@@ -333,11 +333,6 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
         raise RuntimeError("No stitches left to animate")
     peg_idx = int(peg.name.split(".")[-1])
     if last_peg_stitched == peg_idx:  # we did this one already
-        # keyframe all existing stitches to their current position
-        for old_stitch in stitches[:next_available_stitch]:
-            old_stitch.keyframe_insert(data_path="location", frame=frame, index=0)
-            old_stitch.keyframe_insert(data_path="location", frame=frame, index=1)
-            old_stitch.keyframe_insert(data_path="location", frame=frame, index=2)
         return
     stitch = stitches[next_available_stitch]
     stitch.location[0] = StitchOutputLocationXZ.matrix_world.translation[0]
@@ -367,6 +362,8 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
 def move_stitches_down(frame):
     for stitch_list in stitches_on_peg:
         for stitch in stitch_list:
+            # keyframe on previeous frame before moving (else get drift)
+            stitch.keyframe_insert(data_path="location", frame=frame-1, index=2)
             stitch.location[2] -= stitch_size * 2  # (possibly a non-traditional value of down)
             stitch.keyframe_insert(data_path="location", frame=frame, index=2)
 
