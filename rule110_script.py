@@ -252,11 +252,11 @@ def set_state(a, b, c, left, right, frame):
 
 def demo_3bit_cycle(transition_frames=40, static_frames=10):
     global frame
-    # iterate the carriage through inputs abc: 000, 001, 010, ... , 110, 111, 000
+    # iterate the carriage through inputs abc: 000, 001, 010, ... , 110, 111
     inputs_int = [0,1,2,3,4,5,6,7,0]
     inputs_bin = [format(v,'03b') for v in inputs_int]
     old_inputs = '000'
-    for inputs in inputs_bin:
+    for input_idx, inputs in enumerate(inputs_bin):
         # transition to the new input values
         for i in range(transition_frames):
             u = i / float(transition_frames-1)
@@ -264,10 +264,11 @@ def demo_3bit_cycle(transition_frames=40, static_frames=10):
             set_state(values[0], values[1], values[2], 0, 0, frame)
             frame += 1
         # a period of stasis
-        values = [int(inputs[j]) for j in range(3)]
-        for i in range(static_frames):
-            set_state(values[0], values[1], values[2], 0, 0, frame)
-            frame += 1
+        if not input_idx == len(inputs_bin) - 1:
+            values = [int(inputs[j]) for j in range(3)]
+            for i in range(static_frames):
+                set_state(values[0], values[1], values[2], 0, 0, frame)
+                frame += 1
         old_inputs = inputs
 
 
