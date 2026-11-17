@@ -75,7 +75,11 @@ OutputActuatorCenter = bpy.data.objects.get("OutputActuatorCenter")
 UpdaterLeftCenter = bpy.data.objects.get("UpdaterLeftCenter")
 UpdaterRightCenter = bpy.data.objects.get("UpdaterRightCenter")
 StitchOutputLocationXZ = bpy.data.objects.get("StitchOutputLocationXZ")
+sensorA = bpy.data.objects.get("SensorA")
 sensorB = bpy.data.objects.get("SensorB")
+sensorC = bpy.data.objects.get("SensorC")
+sensorLeft = bpy.data.objects.get("SensorLeft")
+sensorRight = bpy.data.objects.get("SensorRight")
 carriage = bpy.data.objects.get("Carriage")
 handles = [bpy.data.objects.get(f"Sensor{k}Handle") for k in ["A", "B", "C"]]  # for showing how sensors work
 sensor_labels = [bpy.data.objects.get(f"Label{k}") for k in ["A", "B", "C"]]
@@ -138,7 +142,7 @@ def set_state(a, b, c, left, right, frame):
     fm_gear_x_offset = 0.0425
     gh_x_offset = 0.0
     output12_x_offset = 0.43
-    j_x_offset = 0.85  
+    j_x_offset = 0.85
     jgear_x_offset = 0.7
     output3_x_offset = 0.85
     p_x_offset = -0.124
@@ -169,7 +173,7 @@ def set_state(a, b, c, left, right, frame):
     t = q * 2
     output5 = min(t, output5)  # pulled back by t
     output5 = max(max(output3, output4), output5)  # pushed forward by output3 and ouput4
-    
+
     A.location[0] = input_x_offset + a * travel
     A.keyframe_insert(data_path="location", frame=frame, index=0)
     B.location[0] = input_x_offset + b * travel
@@ -333,7 +337,7 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=0)
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=1)
             old_stitch.keyframe_insert(data_path="location", frame=frame, index=2)
-        return 
+        return
     stitch = stitches[next_available_stitch]
     stitch.location[0] = StitchOutputLocationXZ.matrix_world.translation[0]
     stitch.location[1] = stitch.location[1] + peg.matrix_world.translation[1] - stitch.matrix_world.translation[1]
@@ -355,11 +359,11 @@ def add_stitch_at_current_peg_if_needed(peg, frame):
     stitch.keyframe_insert(data_path="hide_viewport", frame=frame)
     stitch.keyframe_insert(data_path="hide_render", frame=frame)
     stitches_on_peg[peg_idx].append(stitch)
-    last_peg_stitched = peg_idx    
+    last_peg_stitched = peg_idx
     next_available_stitch += 1
 
 
-def move_stitches_down(frame): 
+def move_stitches_down(frame):
     for stitch_list in stitches_on_peg:
         for stitch in stitch_list:
             stitch.location[2] -= stitch_size * 2  # (possibly a non-traditional value of down)
@@ -370,11 +374,6 @@ def set_carriage_state_from_pegs(frame, frames_per_peg, add_stitches=True):
     """Given the current position of the carriage and the input pegs, set the internal carriage state to match."""
     # set the inputs based on the closest pegs (TODO: animate pushing properly)
     bpy.context.evaluated_depsgraph_get().update()  # (trigger matrix_world updates after moving objects)
-    sensorA = bpy.data.objects.get("SensorA")
-    sensorB = bpy.data.objects.get("SensorB")
-    sensorC = bpy.data.objects.get("SensorC")
-    sensorLeft = bpy.data.objects.get("SensorLeft")
-    sensorRight = bpy.data.objects.get("SensorRight")
     pegA = get_closest_peg(sensorA.matrix_world.translation[1])
     pegB = get_closest_peg(sensorB.matrix_world.translation[1])
     pegC = get_closest_peg(sensorC.matrix_world.translation[1])
@@ -462,8 +461,8 @@ def animate_carriage(start_peg_idx, end_peg_idx, num_passes=1, frames_per_peg=20
     if total_number_of_stitches_produced > num_stitches:
         raise RuntimeError(f"Too many stitches expected: {total_number_of_stitches_produced} > {num_stitches}")
     num_frames_per_pass = abs(end_peg_idx - start_peg_idx) * frames_per_peg + 1
-    start_peg = bpy.data.objects.get(f"Peg.{start_peg_idx:03d}")
-    end_peg = bpy.data.objects.get(f"Peg.{end_peg_idx:03d}")
+    start_peg = pegs[start_peg_idx]
+    end_peg = pegs[end_peg_idx]
     # animate the carriage movement
     carriage_offset = carriage.location[1] - sensorB.matrix_world.translation[1]
     # with current approach for pretend-physics we need to start the carriage in a valid (non-overlapping) state
@@ -497,7 +496,7 @@ def keyframe_visibility(objects, is_hidden, frame):
         obj.hide_render = is_hidden
         obj.keyframe_insert(data_path="hide_viewport", frame=frame)
         obj.keyframe_insert(data_path="hide_render", frame=frame)
-            
+
 
 os.system("cls")
 
@@ -547,8 +546,8 @@ if True:
     keyframe_visibility(always_visible, is_hidden=False, frame=frame)
     for item_list in becoming_visible:
         keyframe_visibility(item_list, is_hidden=False, frame=frame)
-        demo_3bit_cycle(20, 5) 
-        
+        demo_3bit_cycle(20, 5)
+
 # TODO: show system pushing pegs on temp track but without updaters (explain that cannot write back to main track immediately)
 # TODO: explain how actuators (+correctors) work
 # TODO: explain that temp track pegs are inverted (but not to worry for now)
@@ -567,7 +566,7 @@ if True:
 
     keyframe_visibility(track_things + carriage_stuff + temp_track_things, is_hidden=False, frame=frame)
     keyframe_pegs(frame)
-    animate_carriage(24, 53, num_passes=15, frames_per_peg=5, move_pegs=True, add_stitches=True)
+    animate_carriage(29, 53, num_passes=15, frames_per_peg=5, move_pegs=True, add_stitches=True)
 
 bpy.data.scenes[0].frame_start = 0
 bpy.data.scenes[0].frame_end = frame - 1
