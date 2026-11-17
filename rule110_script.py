@@ -556,6 +556,7 @@ if True:
 # TODO: show where yarn selector is attached and how stitches are produced
 
 if True:
+    carriage.keyframe_insert(data_path="location", frame=frame-1, index=1)  # prevent movement affecting earlier frames 
     # show the whole system in action
     keyframe_pegs(frame - 1)  # should probably get used to keyframing everything on every frame even where unmoved and not visible
 
