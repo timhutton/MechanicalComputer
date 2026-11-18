@@ -62,6 +62,29 @@ If the pegs are slightly out of position then the sensors will nudge them back. 
 
 ### Logic components:
 
+Following the work of [Anthony Zhang](https://anthony-zhang.me/blog/rod-logic/) we make use of components that perform the following operations:
+
+#### Invert:
+
+<img src="media/invertB.png" width="70%" alt="A dark blue cog on a fixed axis inverts one rod (light blue) into another (magenta)." /><br>
+<i>Image: A dark blue cog on a fixed axis inverts one rod (light blue) into another (magenta).</i>
+
+#### Average:
+
+<img src="media/average.png" width="70%" alt="A dark blue cog with its access mounted on a dark purple rod." /><br>
+<i>Image: A dark blue cog with its access mounted on a dark purple rod.</i>
+
+#### Multiply:
+
+<img src="media/multiply_x2.png" width="70%" alt=" A green cog with two radii." /><br>
+<i>Image: A green cog with two radii.</i>
+
+### Min/max:
+
+<img src="media/minmax.png" width="70%" alt="A red rod is pushed by an orange rod, and held back by a light blue rod and a magenta rod." /><br>
+<i>Image: A red rod is pushed by an orange rod, and held back by a light blue rod and a magenta rod.</i>
+
+
 ### Actuators:
 
 ### Updaters:
