@@ -1,6 +1,6 @@
 # Rule 110 Knitting Computer
 
-[License](#license)
+[Pegs](#pegs) - [Sensors](#sensors) - [Logic components](#logic) - [Rule 110](#combining) - [Actuators](#actuators) - [Updaters](#updaters) - [Output](#output) - [License](#license)
 
 ## About
 
@@ -140,7 +140,16 @@ The three sensors A, B, C run along the pegs as seen before. At the moment when 
 
 ### Actuators:
 
+To store the output we push a peg. But we can't write it straight back to the input tape because this would affect the computation for the next step when the carriage moves along. So we write it to a separate tape for now, using actuators:
+
+<img src="media/actuator.png" width="70%" alt="An actuator (dark blue) pushing a peg." /><br>
+<i>Image: An actuator (dark blue) pushing a peg.</i>
+
+This device physically pushes the peg down or lifts it up. Due to the way the sensors work, the range of movement isn't the same as the full range of movement of the pegs, so we use little correctors (dark green) to nudge the pegs the remaining distance. These correctors are fixed to the carriage body and don't move with the actuator.
+
 ### Updaters:
+
+### Output:
 
 
 ## License:
