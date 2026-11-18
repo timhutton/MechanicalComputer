@@ -69,21 +69,32 @@ Following the work of [Anthony Zhang](https://anthony-zhang.me/blog/rod-logic/) 
 <img src="media/invertB.png" width="70%" alt="A dark blue cog on a fixed axis inverts one rod (light blue) into another (magenta)." /><br>
 <i>Image: A dark blue cog on a fixed axis inverts one rod (light blue) into another (magenta).</i>
 
+By adding a gear with a fixed axis between two rods as shown we can perform the following operation: b = 1 - a
+
+Note that the values here are in reference to the direction of the first rod.
+
 #### Average:
 
-<img src="media/average.png" width="70%" alt="A dark blue cog with its access mounted on a dark purple rod." /><br>
-<i>Image: A dark blue cog with its access mounted on a dark purple rod.</i>
+<img src="media/average.png" width="70%" alt="A dark blue cog with its axis mounted on a dark purple rod." /><br>
+<i>Image: A dark blue cog with its axis mounted on a dark purple rod.</i>
+
+By mounting a cog on a moving rod we can take the average of two rods: c = (a + b) / 2
 
 #### Multiply:
 
-<img src="media/multiply_x2.png" width="70%" alt=" A green cog with two radii." /><br>
+<img src="media/multiply_x2.png" width="70%" alt="A green cog with two radii." /><br>
 <i>Image: A green cog with two radii.</i>
+
+A gear with two radii can be used to multiply up the movement of a rod: b = a * 2
+
+Of course it could also divide by 2, or apply any other factor.
 
 ### Min/max:
 
 <img src="media/minmax.png" width="70%" alt="A red rod is pushed by an orange rod, and held back by a light blue rod and a magenta rod." /><br>
 <i>Image: A red rod is pushed by an orange rod, and held back by a light blue rod and a magenta rod.</i>
 
+Rods can push/pull each other, applying a min/max operation. In the example shown: d = max(min(a,b), c)
 
 ### Actuators:
 
