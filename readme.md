@@ -191,6 +191,9 @@ The pattern shown in the background of the image above is a visual placeholder f
 **Q:** Can we get the machine to run rule 30 instead?<br>
 **A:** With a few different gears, yes! You could swap out the 'CPU' for a different one, or even one that has switches for different behavior.
 
+**Q:** How does this machine compare with other projects?<br>
+**A:** Anthony Zhang does [some comparison](https://anthony-zhang.me/blog/rod-logic/) of his gates to historical machines. I've seen a few other projects on youtube: [1](https://www.youtube.com/watch?v=-1nbC6IfMm0), [2](https://www.youtube.com/watch?v=QKnSRw_X2w4), [3](https://www.youtube.com/watch?v=zslHoquO5zk), [4](https://www.youtube.com/watch?v=Ubc7iNZ7MV8), [5](https://www.youtube.com/watch?v=GIQDA5Gnxkc) but they seem slow or fragile.
+
 ## License:
 
 The `rule_110.blend` file is available under CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/) as work derived from that of Anthony Zhang: https://anthony-zhang.me/blog/rod-logic/
