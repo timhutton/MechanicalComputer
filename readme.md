@@ -125,7 +125,11 @@ Total: 20 rods (a, b, c, not_a, not_b, not_c, f, g, h, output1, output2, m, p, j
        11 gears (invert_A, invert_C, invert_C, F_gear, E, M_gear, N, J_gear, K, Q, S)
 ```
 
-We have saved a few gears here and there but it might be possible to use fewer moving parts.
+To check the logic, see `rule110_components_table.ods` which computes the truth table:
+
+<img src="media/truth_table.png" width="70%" alt="The truth table for our implementation of computing rule 110 using gears." />
+
+Note that our mechanism isn't a simple composition of gates - we have saved a few gears and rods. And it might be possible to use fewer moving parts.
 
 The whole mechanism looks like this:
 
