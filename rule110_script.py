@@ -1,3 +1,22 @@
+"""
+Mechanical Computer - Copyright (C) 2026 Tim Hutton, tim.hutton@gmail.com
+
+This file is part of Mechanical Computer.
+
+Mechanical Computer is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Mechanical Computer is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Mechanical Computer.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import bpy
 import math
 import numpy as np
@@ -505,7 +524,7 @@ for obj in bpy.data.objects:
     obj.animation_data_clear()
 # also on those materials that are animated
 for i, stitch in enumerate(stitches):
-    if False:  # give each stitch a unique material (only need to do this once) 
+    if False:  # give each stitch a unique material (only need to do this once)
         stitch.data.materials.clear()
         new_mat = bpy.data.materials.new(f"StitchMaterial.{i:03d}")
         stitch.data.materials.append(new_mat)
@@ -554,7 +573,7 @@ if True:
 # TODO: show where yarn selector is attached and how stitches are produced
 
 if True:
-    carriage.keyframe_insert(data_path="location", frame=frame-1, index=1)  # prevent movement affecting earlier frames 
+    carriage.keyframe_insert(data_path="location", frame=frame-1, index=1)  # prevent movement affecting earlier frames
     # show the whole system in action
     keyframe_pegs(frame - 1)  # should probably get used to keyframing everything on every frame even where unmoved and not visible
 

@@ -1,3 +1,22 @@
+"""
+Mechanical Computer - Copyright (C) 2026 Tim Hutton, tim.hutton@gmail.com
+
+This file is part of Mechanical Computer.
+
+Mechanical Computer is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Mechanical Computer is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Mechanical Computer.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import bpy
 import math
 
@@ -14,7 +33,7 @@ keyframes = [
         {'frame':150, 'a':0, 'b':1, 'c':0},
         {'frame':160, 'a':0, 'b':1, 'c':0},
         {'frame':200, 'a':0, 'b':0, 'c':0}]
-        
+
 A = bpy.data.objects.get("A")
 A.animation_data_clear()
 B = bpy.data.objects.get("B")
@@ -58,7 +77,7 @@ cd_x_offset = -0.135
 cd_gear_x_offset = 0.16
 gh_x_offset = 0.0
 output12_x_offset = 0.43
-j_x_offset = 0.85  
+j_x_offset = 0.85
 jgear_x_offset = 0.7
 output3_x_offset = 0.85
 rotation_factor = math.pi * 0.85  # radians per [0,1] distance travelled for meshing
