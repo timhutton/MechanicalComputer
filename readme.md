@@ -1,6 +1,6 @@
 # Rule 110 Knitting Computer
 
-[Pegs](#pegs) - [Sensors](#sensors) - [Logic components](#logic) - [Rule 110](#combining) - [Actuators](#actuators) - [Updaters](#updaters) - [Output](#output) - [License](#license)
+Contents: [Pegs](#pegs) - [Sensors](#sensors) - [Logic components](#logic-components) - [Rule 110](#combining-logic-operations-for-rule-110) - [Actuators](#actuators) - [Updaters](#updaters) - [Output](#output) - [License](#license)
 
 ## About
 
@@ -148,6 +148,15 @@ To store the output we push a peg. But we can't write it straight back to the in
 This device physically pushes the peg down or lifts it up. Due to the way the sensors work, the range of movement isn't the same as the full range of movement of the pegs, so we use little correctors (dark green) to nudge the pegs the remaining distance. These correctors are fixed to the carriage body and don't move with the actuator.
 
 ### Updaters:
+
+Having written the output value to a peg in the second tape, we update the first tape after the machine has passed:
+
+<img src="media/updaters.png" width="70%" alt="An updater (yellow) senses a peg in the bottom strip and pushes a peg in the top strip." /><br>
+<i>Image: An updater (yellow) senses a peg in the bottom strip and pushes a peg in the top strip.</i>
+
+We directly connect a sensor to an actuator using a rod as shown.
+
+Note that we need two of these, as the carriage must work when travelling in either direction. Note that the updater on the leading side dutifully copies across the peg values but in normal operation they are the same already.
 
 ### Output:
 
