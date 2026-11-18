@@ -1,6 +1,6 @@
 # Rule 110 Knitting Computer
 
-Contents: [Pegs](#pegs) - [Sensors](#sensors) - [Logic components](#logic-components) - [Rule 110](#combining-logic-operations-for-rule-110) - [Actuators](#actuators) - [Updaters](#updaters) - [Output](#output) - [License](#license)
+Contents: [Pegs](#pegs) - [Sensors](#sensors) - [Logic components](#logic-components) - [Rule 110](#combining-logic-operations-for-rule-110) - [Actuators](#actuators) - [Updaters](#updaters) - [Output](#output) - [FAQs](#faqs) - [License](#license)
 
 ## About
 
@@ -145,7 +145,7 @@ To store the output we push a peg. But we can't write it straight back to the in
 <img src="media/actuator.png" width="70%" alt="An actuator (dark blue) pushing a peg." /><br>
 <i>Image: An actuator (dark blue) pushing a peg.</i>
 
-This device physically pushes the peg down or lifts it up. Due to the way the sensors work, the range of movement isn't the same as the full range of movement of the pegs, so we use little correctors (dark green) to nudge the pegs the remaining distance. These correctors are fixed to the carriage body and don't move with the actuator.
+This device physically pushes the peg one way or the other. Due to the way the sensors work, the range of movement isn't the same as the full range of movement of the pegs, so we use little correctors (dark green) to nudge the pegs the remaining distance. These correctors are fixed to the carriage body (connections not shown) and don't move with the actuator.
 
 ### Updaters:
 
@@ -156,10 +156,40 @@ Having written the output value to a peg in the second tape, we update the first
 
 We directly connect a sensor to an actuator using a rod as shown.
 
-Note that we need two of these, as the carriage must work when travelling in either direction. Note that the updater on the leading side dutifully copies across the peg values but in normal operation they are the same already.
+Note that we need two of these, as the carriage must work when travelling in either direction. The updater on the leading side doesn't do any harm since the tapes are the same at that point.
+
+So by moving the carriage back and forth across a length of pegs we run the rule 110 cellular automata:
+
+<img src="media/overview.png" width="70%" alt="The machine after a few passes has computed a few iterations of the rule." /><br>
+<i>Image: The machine after a few passes has computed a few iterations of the rule.</i>
 
 ### Output:
 
+The pattern shown in the background of the image above is a visual placeholder for the output of the machine. The original idea was that this be knitting, which would actually hang down in the front. We haven't worked out the details of the yarn selector but it would be controlled by sensor B, as shown with a little rod in the above image.
+
+### FAQs:
+
+**Q:** What stage is this project at?<br>
+**A:** The design stage. A sketch of the machine in action has been animated but lots of details are missing: support structures, output mechanism.
+
+
+**Q:** Can I 3D print the files?<br>
+**A:** No not yet! Lots of work will be needed to add the support structures that will hold the rods and gears in the right place. Much experimentation is needed. Please let me know if you want to try!
+
+**Q:** Will the machine work?<br>
+**A:** Not proven. There might be too much friction. Anthong Zhang showed that his components work but the sensor-peg interaction in particular is unknown.
+
+**Q:** How will the machine produce knitting?<br>
+**A:** Not designed yet. I have hope that it will work - we just need to hold the right yarn in the right place at the right time. See the [videos by Sparks Curiosity](https://www.youtube.com/playlist?list=PLWDnfcUpk7PLQRvfuGytMauK_sR6CEwI9) for more about how knitting machines work. The separation of the pegs will need to be the same as the separation of the needles (typically 9mm or less) which could be tricky to manufacture.
+
+**Q:** How will the boundary conditions work? What happens at each end of each row?<br>
+**A:** In the current design this is unanswered, we just provide lots of pegs.
+
+**Q:** Can we program the machine to knit any pattern we want?<br>
+**A:** No. The output in the current design is simply the output of the rule 110 cellular automata. It's Turing-complete so can _compute_ any output but that output is encoded in the pattern in some way, not just appearing directly on the tape.
+
+**Q:** Can we get the machine to run rule 30 instead?<br>
+**A:** With a few different gears, yes! You could swap out the 'CPU' for a different one, or even one that has switches for different behavior.
 
 ## License:
 
