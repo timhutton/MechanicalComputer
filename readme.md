@@ -1,5 +1,9 @@
 # Rule 110 Knitting Computer
 
+[License](#license)
+
+## About
+
 A few years ago I went to a talk by [Sydney Padua](https://en.wikipedia.org/wiki/Sydney_Padua), about [her book](https://en.wikipedia.org/wiki/The_Thrilling_Adventures_of_Lovelace_and_Babbage) and [the project](https://blog.plan28.org/) to build [Charles Babbage](https://en.wikipedia.org/wiki/Charles_Babbage)'s [Analytical Engine](https://en.wikipedia.org/wiki/Analytical_engine). She showed [some 3D animations](https://www.youtube.com/watch?v=gODpK9dTEWc) she had made of some parts of it. It was inspiring stuff and got me interested in the idea of making a mechanical computer.
 
 <p style="margin-left:5%"><img src="media/LegoDifferenceEngineComponent2.jpg" alt="A Lego model of two numbered wheels" width="50%" /><br>
@@ -60,3 +64,11 @@ If the pegs are slightly out of position then the sensors will nudge them back. 
 
 ### Updaters:
 
+
+## License:
+
+The `rule_110.blend` file is available under CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/) as work derived from that of Anthony Zhang: https://anthony-zhang.me/blog/rod-logic/
+
+Other `.blend` files are also available under CC BY-NC-SA 4.0.
+
+Python scripts available under GPL3, as work derived from the Blender Python API: https://www.blender.org/about/license/
