@@ -129,7 +129,7 @@ To check the logic, see `rule110_components_table.ods` which computes the truth 
 
 <img src="media/truth_table.png" width="70%" alt="The truth table for our implementation of computing rule 110 using gears." />
 
-Note that our mechanism isn't a simple composition of gates - we have saved a few gears and rods. And it might be possible to use fewer moving parts.
+Note that our mechanism isn't a simple composition of AND and OR gates - we have saved a few gears and rods. And it might be possible to use still fewer moving parts.
 
 The whole mechanism looks like this:
 
@@ -151,7 +151,7 @@ This device physically pushes the peg down or lifts it up. Due to the way the se
 
 Having written the output value to a peg in the second tape, we update the first tape after the machine has passed:
 
-<img src="media/updaters.png" width="70%" alt="An updater (yellow) senses a peg in the bottom strip and pushes a peg in the top strip." /><br>
+<img src="media/updater.png" width="70%" alt="An updater (yellow) senses a peg in the bottom strip and pushes a peg in the top strip." /><br>
 <i>Image: An updater (yellow) senses a peg in the bottom strip and pushes a peg in the top strip.</i>
 
 We directly connect a sensor to an actuator using a rod as shown.
