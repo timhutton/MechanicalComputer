@@ -50,9 +50,11 @@ These pegs are designed to have a little friction, so that they don't vibrate ou
 
 The pegs are designed to work together with the sensors, which are little diamond shapes attached to rods. The rods are constrained to only move along their length, so as the carriage comes along the sensors translate the 0,1 position of a peg into a vertical motion of the rod.
 
+<img src="media/sensor_image.png" width="30%" alt="A blue sensor and an attached rod on a tape of pegs." /><img src="media/sensor_image2.png" width="30%" alt="Three blue sensors labelled A, B, C and attached rods on a tape of pegs." />
+
 https://github.com/user-attachments/assets/a61cf8b2-bdf8-4a0e-8b16-e914046d93ee
 
-<i>Video: An animation of sensors moving past fixed pegs. Firstly one sensor, then a group of three sensors reading from three neighboring pegs.</i>
+<i>Images, video: Sensors moving past fixed pegs. Firstly one sensor, then a group of three sensors reading from three neighboring pegs.</i>
 
 The sensors should work whichever position the peg is in. The pegs cannot move beyond their end stops, which gives the sensors something to push against. Note that the sensors don't normally alter the peg positions.
 
