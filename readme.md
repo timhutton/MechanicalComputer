@@ -96,6 +96,44 @@ Of course it could also divide by 2, or apply any other factor.
 
 Rods can push/pull each other, applying a min/max operation. In the example shown: d = max(min(a,b), c)
 
+### Combining logic operations for rule 110:
+
+One simple way to express the 110 rule is: rule110(A, B, C) = (not(A) AND B) OR (B XOR C)
+
+With our gears we can achieve this as follows:
+
+```
+not_a = 1 - a
+not_b = 1 - b
+not_c = 1 - c
+f = (c + not_b) / 2
+g = f * 2 - 1 = c + not_b - 1 (using gear E)
+h = -g (using the opposite side of gear E)
+output1 = min(min(c, not_b), g)  # pushed forward by g, pulled back by c and not_b = c AND not_b
+output2 = min(min(not_c, b), h)  # pushed forward by h, pulled back by not_c and b = not_c AND b
+m = (b + not_a) / 2
+p = m * 2 - 1 (using gear N)
+j = (output1 + output2) / 2
+output3 = j * 2 = b XOR c (using gear K)
+output4 = min(min(b, not_a), p)  # pushed forward by p, pulled back by b and not_a = not_a AND b
+q = (output3 + output4) / 2 (q is the gear, r is the rod)
+t = q * 2 (using gear S)
+output5 = min(max(output3, output4), t)  # pulled back by t, pushed forward by output3 and ouput4
+        = (b XOR c) OR (not_a AND b) = rule110
+
+Total: 20 rods (a, b, c, not_a, not_b, not_c, f, g, h, output1, output2, m, p, j, output3, output4, q, t, r, output5)
+       11 gears (invert_A, invert_C, invert_C, F_gear, E, M_gear, N, J_gear, K, Q, S)
+```
+
+We have saved a few gears here and there but it might be possible to use fewer moving parts.
+
+The whole mechanism looks like this:
+
+<img src="media/mechanism.png" width="70%" alt="Cogs and rods in different colors, computing the 110 rule from the values on three sensors." /><br>
+<i>Image: Cogs and rods in different colors, computing the 110 rule from the values on three sensors.</i>
+
+The three sensors A, B, C run along the pegs as seen before. At the moment when each is directly aligned with a peg the output rod (dark blue) is in the correct position for rule 110.
+
 ### Actuators:
 
 ### Updaters:
