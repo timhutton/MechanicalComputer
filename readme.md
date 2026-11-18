@@ -52,7 +52,7 @@ The pegs are designed to work together with the sensors, which are little diamon
 
 https://github.com/user-attachments/assets/a61cf8b2-bdf8-4a0e-8b16-e914046d93ee
 
-<img src="media/sensor_image.png" width="40%" alt="A blue sensor and an attached rod on a tape of pegs." />&nbsp;<img src="media/sensor_image2.png" width="4&nbsp;0%" alt="Three blue sensors labelled A, B, C and attached rods on a tape of pegs." />
+<img src="media/sensor_image.png" width="40%" alt="A blue sensor and an attached rod on a tape of pegs." />&nbsp;<img src="media/sensor_image2.png" width="40%" alt="Three blue sensors labelled A, B, C and attached rods on a tape of pegs." />
 
 <i>Images, video: Sensors moving past fixed pegs. Firstly one sensor, then a group of three sensors reading from three neighboring pegs.</i>
 
