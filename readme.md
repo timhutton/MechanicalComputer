@@ -9,7 +9,7 @@ A few years ago I went to a talk by [Sydney Padua](https://en.wikipedia.org/wiki
 <p style="margin-left:5%"><img src="media/LegoDifferenceEngineComponent2.jpg" alt="A Lego model of two numbered wheels" width="50%" /><br>
 <i>Image: A Lego model of part of the Difference Engine I made for a workshop. It has two numbered wheels, with cogs underneath showing that when you rotate one they both rotate. You can interpret their movement as adding two numbers together.</i>
 
-In 2010 [I implemented a computer](https://timhutton.github.io/2010/03/10/30984.html) in a 2D cellular automata, based on a design from 1968. But it was [enormous](https://timhutton.github.io/2011/11/01/35566.html) and may never be run to completion!
+In 2010 I [made a computer](https://timhutton.github.io/2010/03/10/30984.html) in a 2D cellular automata, based on a design from 1968. But it was [enormous](https://timhutton.github.io/2011/11/01/35566.html) and may never be run to completion!
 
 More recently (October 2026) I went to an exhibition by [Madeleine Shepherd](https://www.madeleineshepherd.co.uk/) where she showed some of her [cellular automata knitting](https://www.madeleineshepherd.co.uk/gallery_779383.html).
 
@@ -93,6 +93,10 @@ A gear with two radii can be used to multiply up the movement of a rod: b = a * 
 
 Of course it could also divide by 2, or apply any other factor.
 
+#### Add/subtract:
+
+It is actually trivial to add or subtract a value - simply make the rod longer or shorter. You'll see the occasional `-1` mentioned below which is there to make the math work but these are just absorbed in the placement of the rods and don't need extra components.
+
 ### Min/max:
 
 <img src="media/minmax.png" width="70%" alt="A red rod is pushed by an orange rod, and held back by a light blue rod and a magenta rod." /><br>
@@ -129,18 +133,20 @@ Total: 20 rods (a, b, c, not_a, not_b, not_c, f, g, h, output1, output2, m, p, j
        11 gears (invert_A, invert_C, invert_C, F_gear, E, M_gear, N, J_gear, K, Q, S)
 ```
 
+The names of components here correspond to the objects in the Blender file which you can download to explore.
+
 To check the logic, see `rule110_components_table.ods` which computes the truth table:
 
 <img src="media/truth_table.png" width="70%" alt="The truth table for our implementation of computing rule 110 using gears." />
 
-Note that our mechanism isn't a simple composition of AND and OR gates - we have saved a few gears and rods. And it might be possible to use still fewer moving parts.
+Note that our mechanism isn't a simple composition of AND, OR and NOT gates - we have saved a few gears and rods. And it might be possible to use still fewer moving parts.
 
 The whole mechanism looks like this:
 
 <img src="media/mechanism.png" width="70%" alt="Cogs and rods in different colors, computing the 110 rule from the values on three sensors." /><br>
 <i>Image: Cogs and rods in different colors, computing the 110 rule from the values on three sensors.</i>
 
-The three sensors A, B, C run along the pegs as seen before. At the moment when each is directly aligned with a peg the output rod (dark blue) is in the correct position for rule 110.
+The three sensors A, B, C run along the pegs as seen before. At the moment when each is directly aligned with a peg the output rod (dark blue) is in the correct position for the output of rule 110.
 
 ### Actuators:
 
@@ -167,6 +173,8 @@ So by moving the carriage back and forth across a length of pegs we run the rule
 <img src="media/overview.png" width="70%" alt="The machine after a few passes has computed a few iterations of the rule." /><br>
 <i>Image: The machine after a few passes has computed a few iterations of the rule.</i>
 
+Note that the second tape has inverted pegs compared to the first one. This is just a quirk of how the sensors and actuators work.
+
 ### Output:
 
 The pattern shown in the background of the image above is a visual placeholder for the output of the machine. The idea is that this will be knitting, which would actually hang down in the front. We haven't worked out the details of the yarn selector but it would be controlled by sensor B, as shown with a little rod in the above image.
@@ -180,10 +188,10 @@ The pattern shown in the background of the image above is a visual placeholder f
 **A:** No not yet! Lots of work will be needed to add the support structures that will hold the rods and gears in the right place. Much experimentation is needed. Please let me know if you want to try!
 
 **Q:** Will the machine work?<br>
-**A:** Not proven. There might be too much friction. Anthong Zhang showed that his components work but the sensor-peg interaction in particular is unknown.
+**A:** Not proven. There might be too much friction. Anthony Zhang showed that his components work but the sensor-peg interaction in particular is unknown.
 
 **Q:** How will the machine produce knitting?<br>
-**A:** Not designed yet. I have hope that it will work - we just need to hold the right yarn in the right place at the right time. See the [videos by Sparks Curiosity](https://www.youtube.com/playlist?list=PLWDnfcUpk7PLQRvfuGytMauK_sR6CEwI9) for more about how knitting machines work. The separation of the pegs will need to be the same as the separation of the needles (typically 9mm or less) which could be tricky to manufacture.
+**A:** Not designed yet. I have hope that we can make it work - in theory we just need to hold the right yarn in the right place at the right time. See the [videos by Sparks Curiosity](https://www.youtube.com/playlist?list=PLWDnfcUpk7PLQRvfuGytMauK_sR6CEwI9) for more about how knitting machines work. The separation of the pegs will likely need to be the same as the separation of the needles (typically 9mm or less) which could be tricky to manufacture.
 
 **Q:** How will the boundary conditions work? What happens at each end of each row?<br>
 **A:** In the current design this is unanswered, we just provide lots of pegs.
@@ -199,6 +207,9 @@ The pattern shown in the background of the image above is a visual placeholder f
 
 **Q:** Will we be able to use the machine to compute something useful?<br>
 **A:** No. Running rule 110 isn't an efficient way to compute anything. Even the simplest programs would need tens of thousands or millions of pegs. This project is more of a proof of concept, as a demonstration of a simple computer.
+
+**Q:** What are the next steps?<br>
+**A:** Let me know if you think we should actually try to build this thing. We would need to add the support stuctures, make some test components, and design the knitting bits.
 
 ## License:
 
