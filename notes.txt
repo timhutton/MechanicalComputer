@@ -1,1 +1,0 @@
-ffmpeg -framerate 24 -i frames\rule110_v3\frame%04d.png -c:v libx264 -pix_fmt yuv420p rule110_v3.mp4
