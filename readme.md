@@ -219,6 +219,6 @@ The pattern shown in the background of the image above is a visual placeholder f
 
 The `rule_110.blend` file is available under CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/) as work derived from that of Anthony Zhang: https://anthony-zhang.me/blog/rod-logic/
 
-Other `.blend` files are also available under CC BY-NC-SA 4.0.
+The Python scripts are available under GPL3, as work derived from the Blender Python API: https://www.blender.org/about/license/
 
-Python scripts available under GPL3, as work derived from the Blender Python API: https://www.blender.org/about/license/
+All other files are available under CC BY-NC-SA 4.0.
