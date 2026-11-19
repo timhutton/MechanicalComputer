@@ -1,15 +1,17 @@
 # Rule 110 Knitting Computer
 
-Contents: [Pegs](#pegs) - [Sensors](#sensors) - [Logic components](#logic-components) - [Rule 110](#combining-logic-operations-for-rule-110) - [Actuators](#actuators) - [Updaters](#updaters) - [Output](#output) - [FAQs](#faqs) - [License](#license)
+Contents: [Background](#background) - [Operation](#operation) - [FAQs](#faqs) - [License](#license)
 
-## About
+## Background:
 
-A few years ago I went to a talk by [Sydney Padua](https://en.wikipedia.org/wiki/Sydney_Padua), about [her book](https://en.wikipedia.org/wiki/The_Thrilling_Adventures_of_Lovelace_and_Babbage) and [the project](https://blog.plan28.org/) to build [Charles Babbage](https://en.wikipedia.org/wiki/Charles_Babbage)'s [Analytical Engine](https://en.wikipedia.org/wiki/Analytical_engine). She showed [some 3D animations](https://www.youtube.com/watch?v=gODpK9dTEWc) she had made of some parts of it. It was inspiring stuff and got me interested in the idea of making a mechanical computer.
+A few years ago I went to a talk by [Sydney Padua](https://en.wikipedia.org/wiki/Sydney_Padua), about [her book](https://en.wikipedia.org/wiki/The_Thrilling_Adventures_of_Lovelace_and_Babbage) and [the project](https://blog.plan28.org/) to build [Charles Babbage](https://en.wikipedia.org/wiki/Charles_Babbage)'s [Analytical Engine](https://en.wikipedia.org/wiki/Analytical_engine). She showed [some 3D animations](https://www.youtube.com/watch?v=gODpK9dTEWc) she had made of some parts of it. It was inspiring stuff and got me interested in the idea of making a mechanical computer. But his machine is enormous and may never be built!
 
 <p style="margin-left:5%"><img src="media/LegoDifferenceEngineComponent2.jpg" alt="A Lego model of two numbered wheels" width="50%" /><br>
 <i>Image: A Lego model of part of the Difference Engine I made for a workshop. It has two numbered wheels, with cogs underneath showing that when you rotate one they both rotate. You can interpret their movement as adding two numbers together.</i>
 
-Then recently (October 2026) I went to an exhibition by [Madeleine Shepherd](https://www.madeleineshepherd.co.uk/) where she showed some of her [cellular automata knitting](https://www.madeleineshepherd.co.uk/gallery_779383.html).
+In 2010 [I implemented a computer](https://timhutton.github.io/2010/03/10/30984.html) in a 2D cellular automata, based on a design from 1968. But it was [enormous](https://timhutton.github.io/2011/11/01/35566.html) and may never be run to completion!
+
+More recently (October 2026) I went to an exhibition by [Madeleine Shepherd](https://www.madeleineshepherd.co.uk/) where she showed some of her [cellular automata knitting](https://www.madeleineshepherd.co.uk/gallery_779383.html).
 
 <p style="margin-left:5%"><img src="media/MadeleineShepherdUnconformitiesExhibition.jpg" width="30%" alt="Madeleine Shepherd demonstrating her work on a knitting machine" /> <img src="media/Madeleine_Shepherd_-_Knot_Unknot_-_Rule_30_purses_neck_warmer_and_shoulder_bag_black_and_white_preview.jpg" width="60%" alt="Some knitted objects with the rule 30 cellular automata pattern in black and white."><br>
 <i>Images: (left) Madeleine Shepherd demonstrating her work on a knitting machine. (right) Some of her knitted objects with the rule 30 cellular automata pattern in black and white. <a href="https://www.madeleineshepherd.co.uk/photo_17119556.html">[Image source]</a></i>
@@ -23,6 +25,8 @@ And I'm thinking:
 <p style="margin-left:5%">Furthermore, if we used one of the universal cellular automata, it would actually become a full computer in its own right!</i>
 
 And thus the Rule 110 Knitting Computer project was born.
+
+## Operation:
 
 ### Pegs:
 
@@ -165,13 +169,12 @@ So by moving the carriage back and forth across a length of pegs we run the rule
 
 ### Output:
 
-The pattern shown in the background of the image above is a visual placeholder for the output of the machine. The original idea was that this be knitting, which would actually hang down in the front. We haven't worked out the details of the yarn selector but it would be controlled by sensor B, as shown with a little rod in the above image.
+The pattern shown in the background of the image above is a visual placeholder for the output of the machine. The idea is that this will be knitting, which would actually hang down in the front. We haven't worked out the details of the yarn selector but it would be controlled by sensor B, as shown with a little rod in the above image.
 
-### FAQs:
+## FAQs:
 
 **Q:** What stage is this project at?<br>
 **A:** The design stage. A sketch of the machine in action has been animated but lots of details are missing: support structures, output mechanism.
-
 
 **Q:** Can I 3D print the files?<br>
 **A:** No not yet! Lots of work will be needed to add the support structures that will hold the rods and gears in the right place. Much experimentation is needed. Please let me know if you want to try!
