@@ -60,9 +60,9 @@ https://github.com/user-attachments/assets/a61cf8b2-bdf8-4a0e-8b16-e914046d93ee
 
 <i>Images, video: Sensors moving past fixed pegs. Firstly one sensor, then a group of three sensors reading from three neighboring pegs.</i>
 
-The sensors should work whichever position the peg is in. The pegs cannot move beyond their end stops, which gives the sensors something to push against. Note that the sensors don't normally alter the peg positions.
+The pegs cannot move beyond their end stops, which gives the sensors something to push against. This is what powers the mechanism.
 
-If the pegs are slightly out of position then the sensors will nudge them back. If the pegs are dramatically out of position then the sensor could go to the wrong side, or get jammed.
+Note that the sensors don't normally alter the peg positions but if the pegs are slightly out of position then the sensors will nudge them back. If the pegs are dramatically out of position then the sensor could go to the wrong side, or get jammed.
 
 ### Logic components:
 
@@ -156,6 +156,8 @@ To store the output we push a peg. But we can't write it straight back to the in
 <i>Image: An actuator (dark blue) pushing a peg.</i>
 
 This device physically pushes the peg one way or the other. Due to the way the sensors work, the range of movement isn't the same as the full range of movement of the pegs, so we use little correctors (dark green) to nudge the pegs the remaining distance. These correctors are fixed to the carriage body (connections not shown) and don't move with the actuator.
+
+Instead of using correctors we could use a gear to extend the movement of the actuators. This would work but would mean having more moving parts.
 
 ### Updaters:
 
