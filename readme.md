@@ -4,7 +4,7 @@ Contents: [Background](#background) - [Operation](#operation) - [FAQs](#faqs) - 
 
 ## Background:
 
-A few years ago I went to a talk by [Sydney Padua](https://en.wikipedia.org/wiki/Sydney_Padua), about [her book](https://en.wikipedia.org/wiki/The_Thrilling_Adventures_of_Lovelace_and_Babbage) and [the project](https://blog.plan28.org/) to build [Charles Babbage](https://en.wikipedia.org/wiki/Charles_Babbage)'s [Analytical Engine](https://en.wikipedia.org/wiki/Analytical_engine). She showed [some 3D animations](https://www.youtube.com/watch?v=gODpK9dTEWc) she had made of some parts of it. It was inspiring stuff and got me interested in the idea of making a mechanical computer. But his machine is enormous and may never be built!
+A few years ago I went to a talk by [Sydney Padua](https://en.wikipedia.org/wiki/Sydney_Padua), about [her book](https://en.wikipedia.org/wiki/The_Thrilling_Adventures_of_Lovelace_and_Babbage) and [the project](https://blog.plan28.org/) to build [Charles Babbage](https://en.wikipedia.org/wiki/Charles_Babbage)'s [Analytical Engine](https://en.wikipedia.org/wiki/Analytical_engine). She showed [some 3D animations](https://www.youtube.com/watch?v=gODpK9dTEWc) she had made of some parts of it. It was inspiring stuff and got me interested in the idea of making a mechanical computer. But Babbage's machine is enormous and may never be built!
 
 <p style="margin-left:5%"><img src="media/LegoDifferenceEngineComponent2.jpg" alt="A Lego model of two numbered wheels" width="50%" /><br>
 <i>Image: A Lego model of part of the Difference Engine I made for a workshop. It has two numbered wheels, with cogs underneath showing that when you rotate one they both rotate. You can interpret their movement as adding two numbers together.</i>
@@ -195,7 +195,10 @@ The pattern shown in the background of the image above is a visual placeholder f
 **A:** With a few different gears, yes! You could swap out the 'CPU' for a different one, or even one that has switches for different behavior.
 
 **Q:** How does this machine compare with other projects?<br>
-**A:** Anthony Zhang does [some comparison](https://anthony-zhang.me/blog/rod-logic/) of his gates to historical machines. I've seen a few other projects on youtube: [1](https://www.youtube.com/watch?v=-1nbC6IfMm0), [2](https://www.youtube.com/watch?v=QKnSRw_X2w4), [3](https://www.youtube.com/watch?v=zslHoquO5zk), [4](https://www.youtube.com/watch?v=Ubc7iNZ7MV8), [5](https://www.youtube.com/watch?v=GIQDA5Gnxkc) but they seem slow or fragile.
+**A:** Anthony Zhang does [some comparison](https://anthony-zhang.me/blog/rod-logic/) of his gates to historical machines. I've seen a few other projects on youtube: [1](https://www.youtube.com/watch?v=-1nbC6IfMm0), [2](https://www.youtube.com/watch?v=QKnSRw_X2w4), [3](https://www.youtube.com/watch?v=zslHoquO5zk), [4](https://www.youtube.com/watch?v=Ubc7iNZ7MV8), [5](https://www.youtube.com/watch?v=GIQDA5Gnxkc). In general they seem slow or fragile.
+
+**Q:** Will we be able to use the machine to compute something useful?<br>
+**A:** No. Running rule 110 isn't an efficient way to compute anything. Even the simplest programs would need tens of thousands or millions of pegs. This project is more of a proof of concept, as a demonstration of a simple computer.
 
 ## License:
 
