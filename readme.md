@@ -175,6 +175,8 @@ So by moving the carriage back and forth across a length of pegs we run the rule
 
 Note that the second tape has inverted pegs compared to the first one. This is just a quirk of how the sensors and actuators work.
 
+With the two updaters there is a total of 33 moving parts (22 rods, 11 gears) not counting the pegs.
+
 ### Output:
 
 The pattern shown in the background of the image above is a visual placeholder for the output of the machine. The idea is that this will be knitting, which would actually hang down in the front. We haven't worked out the details of the yarn selector but it would be controlled by sensor B, as shown with a little rod in the above image.
