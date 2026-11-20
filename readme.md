@@ -1,6 +1,6 @@
 Contents: [Background](#background) - [Operation](#operation) - [FAQs](#faqs) - [License](#license)
 
-# Mechanical (Knitting) Computer
+# Mechanical Computer
 
 Videos: (click to play)
 
