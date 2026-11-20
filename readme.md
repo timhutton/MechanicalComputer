@@ -1,6 +1,6 @@
 Contents: [Background](#background) - [Operation](#operation) - [FAQs](#faqs) - [License](#license)
 
-# Rule 110 Knitting Computer
+# Mechanical (Knitting) Computer
 
 Videos: (click to play)
 
