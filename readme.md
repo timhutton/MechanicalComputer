@@ -1,10 +1,9 @@
 # Rule 110 Knitting Computer
 
-Videos:
+Videos: (click to play)
 
-https://www.youtube.com/shorts/iIKQuGVjefM
-
-https://www.youtube.com/watch?v=TBCexW6co-U
+<a href="https://www.youtube.com/shorts/iIKQuGVjefM"><img src="media/triangle.png" width="16%" /></a>
+<a href="https://www.youtube.com/watch?v=TBCexW6co-U"><img src="media/machine.png" width="50%" /></a>
 
 Contents: [Background](#background) - [Operation](#operation) - [FAQs](#faqs) - [License](#license)
 
