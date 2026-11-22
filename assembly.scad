@@ -1,6 +1,5 @@
 mod = 1.5;        // Module (mm)
 teeth = 10;       // Pinion teeth
-pressure_angle = 20;
 thickness = 5;    // Extrusion height (mm)
 rack_teeth = 12;
 rack_pos = $t; // [0:0.001:1]
@@ -9,16 +8,19 @@ pitch = PI * mod;
 pitch_d = mod * teeth;
 addendum = mod;
 dedendum = 1.25 * mod;
+top_w = pitch * 0.25;
+mid_w = pitch * 0.47;
+bot_w = pitch * 0.5;
 
 module rack_tooth() {
-    top_w = pitch * 0.35;
-    bot_w = pitch * 0.5;
     linear_extrude(height = thickness, center = false) {
         polygon(points=[
         [-bot_w/2, -dedendum],
         [ bot_w/2, -dedendum],
+        [ mid_w/2, 0],
         [ top_w/2,  addendum],
-        [-top_w/2,  addendum]
+        [-top_w/2,  addendum],
+        [-mid_w/2, 0]
         ]);
     }
 }
@@ -36,8 +38,8 @@ module rack() {
 }
 
 module pinion() {
-    outer_r = pitch_d / 2 + addendum;
-    root_r = pitch_d / 2 - dedendum;
+    extra_radius_factor = 1.02; // need to cover the base of the teeth
+    root_r = (pitch_d / 2 - dedendum) * extra_radius_factor;
     union() {
         cylinder(h = thickness, r = root_r, $fn = 64);
         for (i = [0 : teeth - 1]) {
