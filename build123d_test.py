@@ -13,14 +13,16 @@ def check_proximity(parts, tolerance):
             print(f"WARNING: Objects too close ({a.distance(b)}): {a}, {b}")
 
 
-pinion_teeth = 8
+pinion_teeth = 10
 rack_teeth = 15
-pinion = SpurGear(number_of_teeth=pinion_teeth, height=4, backlash=0.05)
-rack = InvoluteRack(number_of_teeth=rack_teeth, height=4, backlash=0.05)
-rack.mesh_to(pinion, target_dir=LEFT, offset=0, backlash=0.2, angle_bias=0)
-
-pinion_part = pinion.build_part()
-rack_part = rack.build_part()
+module = 1.5
+height = 4  # (gear/rack thickness in z-direction)
+prescaled_height = height / module  # (rack.mesh_to() only support module=1)
+pinion = SpurGear(number_of_teeth=pinion_teeth, module=1, height=prescaled_height, backlash=0.05)
+rack = InvoluteRack(number_of_teeth=rack_teeth, module=1, height=prescaled_height, backlash=0.05)
+rack.mesh_to(pinion, target_dir=LEFT, offset=-4, backlash=0.2, angle_bias=0)
+pinion_part = pinion.build_part().scale(module)
+rack_part = rack.build_part().scale(module)
 hole_obj = pinion.center_location_top * Hole(radius=1, depth=6)
 pinion_part = pinion_part.cut(hole_obj)
 
@@ -31,14 +33,14 @@ group = AnimationGroup(
 show(group)
 
 steps = 60
-rack_movement = -5  # how many teeth to move along?
-rack_pitch = PI  # (since module is 1)
+rack_movement = 10  # how many teeth to move along?
+rack_pitch = PI * module
 time_track = np.linspace(0, 5, steps + 1)
 y_positions = np.linspace(0, rack_pitch * rack_movement, steps + 1)
 pinion_rotation = -360 * rack_movement / pinion_teeth
 rotation_track = np.linspace(0, pinion_rotation, steps + 1)
 
-animation = Animation(group)
+animation = Animation()
 animation.add_track("/assembly/rack", "ty", time_track, normalize_track(y_positions))
 animation.add_track("/assembly/pinion", "rz", time_track, normalize_track(rotation_track))
 animation.animate(speed=1)
