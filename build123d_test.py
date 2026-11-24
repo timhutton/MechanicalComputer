@@ -1,43 +1,50 @@
+from bd_animation import AnimationGroup, normalize_track
 from build123d import *
-import itertools
-from ocp_vscode import show
+from functools import reduce
+from itertools import combinations
+from ocp_vscode import Animation, show
 from py_gearworks import *
 
 
 def check_proximity(parts, tolerance):
     """Check that all parts are separated by at least tolerance."""
-    for a,b in itertools.combinations(parts, 2):
+    for a,b in combinations(parts, 2):
         if a.distance(b) < tolerance:
             print(f"WARNING: Objects too close ({a.distance(b)}): {a}, {b}")
 
 
-length, width, base_height = 110, 50, 20
+pinion_teeth = 8
+rack_teeth = 15
+pinion = SpurGear(number_of_teeth=pinion_teeth, height=4, backlash=0.05)
+rack = InvoluteRack(number_of_teeth=rack_teeth, height=4, backlash=0.05)
+rack.mesh_to(pinion, target_dir=LEFT, offset=0, backlash=0.2, angle_bias=0)
 
-base_plan = Rectangle(length, width) - Circle(10)
-base = extrude(base_plan, amount=base_height)
-base.label = "base"
+pinion_part = pinion.build_part()
+rack_part = rack.build_part()
+hole_obj = pinion.center_location_top * Hole(radius=1, depth=6)
+pinion_part = pinion_part.cut(hole_obj)
 
-rod_plan = Circle(8)
-rod = extrude(rod_plan, amount=base_height*2, both=True)
-rod.label = "rod"
+group = AnimationGroup(
+    children={"rack": rack_part, "pinion": pinion_part},
+    label="assembly"
+)
+show(group)
 
-gear2 = SpurGear(number_of_teeth=8, height=4, backlash=0.05)
-gear2.center = LEFT * 10
-rack2 = InvoluteRack(number_of_teeth=10, height=4, backlash=0.05)
-rack2.mesh_to(gear2, target_dir=LEFT, offset=0, backlash=0.2, angle_bias=0)
+steps = 60
+rack_movement = -5  # how many teeth to move along?
+rack_pitch = PI  # (since module is 1)
+time_track = np.linspace(0, 5, steps + 1)
+y_positions = np.linspace(0, rack_pitch * rack_movement, steps + 1)
+pinion_rotation = -360 * rack_movement / pinion_teeth
+rotation_track = np.linspace(0, pinion_rotation, steps + 1)
 
+animation = Animation(group)
+animation.add_track("/assembly/rack", "ty", time_track, normalize_track(y_positions))
+animation.add_track("/assembly/pinion", "rz", time_track, normalize_track(rotation_track))
+animation.animate(speed=1)
 
-gear2_part = gear2.build_part()
-rack2_part = rack2.build_part()
-
-hole_obj = gear2.center_location_top * Hole(radius=1, depth=6)
-gear2_part = gear2_part.cut(hole_obj)
-
-parts = [gear2_part, rack2_part]
-
-# export as single object for print-in-place
-whole = gear2_part + rack2_part
-export_stl(whole, "rack_pinion_test.stl")
-
+# check tolerances and export to STL
+parts = [pinion_part, rack_part]
 check_proximity(parts, tolerance=0.05)
-show(whole)
+whole = reduce(lambda result, current: result + current, parts)
+export_stl(whole, "rack_pinion_test.stl")
