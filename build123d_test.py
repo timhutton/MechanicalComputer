@@ -40,10 +40,15 @@ rack_base_height = rack_part.edges().filter_by(Axis.X)[0].length
 rack_base = rack_part.faces().sort_by(Axis.X)[0]
 rack_part += extrude(rack_base, amount=rod_thickness - rack_base_height)
 rack_end1 = rack_part.faces().sort_by(Axis.Y)[0]
-rack_part += extrude(rack_end1, amount=travel)
+rack_part += extrude(rack_end1, amount=travel + rod_thickness * 2)
 rack_end2 = rack_part.faces().sort_by(Axis.Y)[-1]
-rack_part += extrude(rack_end2, amount=travel)
+rack_part += extrude(rack_end2, amount=travel + rod_thickness * 2)
 
+# add end stoppers to the rod
+rack_part += Box(rod_thickness, rod_thickness - clearance, rod_thickness).translate((-rod_thickness, travel + rod_thickness * 1.5 + clearance / 2, rod_thickness / 2))
+rack_part += Box(rod_thickness, rod_thickness - clearance, rod_thickness).translate((-rod_thickness, -(travel * 2 + rod_thickness * 1.5 + clearance / 2), rod_thickness / 2))
+
+# make an axle to hold the pinion
 axle_length = rod_thickness + clearance * 2
 axle = Cylinder(radius=axle_radius, height=axle_length)
 axle_cap_radius = axle_radius + clearance * 2
@@ -52,7 +57,23 @@ axle_cap = Cylinder(radius=axle_cap_radius, height=axle_cap_length)
 axle_cap.location = Pos([0, 0, rod_thickness / 2 + clearance * 2])
 axle += axle_cap
 axle.location = Pos([0, 0, rod_thickness / 2])
-support = axle
+
+# make sleeves to support the rod
+sleeve_sketch = Plane.XZ * Rectangle(rod_thickness * 2, rod_thickness * 2)
+sleeve_sketch -= offset(sleeve_sketch, amount=-(rod_thickness / 2 - clearance))
+sleeve1 = extrude(sleeve_sketch, amount = rod_thickness)
+sleeve1.location = Pos(rack_end1.center())
+sleeve2 = sleeve1.located(Pos(rack_end2.center() + 
+                              (0, travel + rod_thickness, 0)))
+
+# make a back piece to join the sleeves to the axle
+back_height = axle_radius - sleeve1.faces().sort_by(Axis.X)[0].center().X
+back_width = travel * 2 + rod_thickness * 4
+back_thickness = rod_thickness / 2
+back = Box(back_height, back_width, back_thickness)
+back.location = Pos(-back_height / 2 + axle_radius, 0, -(back_thickness /2 + clearance))
+
+support = back + axle + sleeve1 + sleeve2
 
 group = AnimationGroup(
     children={"rack": rack_part,
@@ -74,7 +95,7 @@ animation.add_track("/assembly/pinion", "rz", time_track, normalize_track(rotati
 animation.animate(speed=1)
 
 # check tolerances and export to STL
-parts = [pinion_part, rack_part, support]
+parts = group.children
 check_proximity(parts, tolerance=clearance)
 whole = reduce(lambda a, b: a + b, parts)
 export_stl(whole, "rack_pinion_test.stl")
