@@ -45,8 +45,8 @@ rack_end2 = rack_part.faces().sort_by(Axis.Y)[-1]
 rack_part += extrude(rack_end2, amount=travel + rod_thickness * 2)
 
 # add end stoppers to the rod
-rack_part += Box(rod_thickness, rod_thickness - clearance, rod_thickness).translate((-rod_thickness, travel + rod_thickness * 1.5 + clearance / 2, rod_thickness / 2))
-rack_part += Box(rod_thickness, rod_thickness - clearance, rod_thickness).translate((-rod_thickness, -(travel * 2 + rod_thickness * 1.5 + clearance / 2), rod_thickness / 2))
+rack_part += Box(rod_thickness * 2, rod_thickness - clearance, rod_thickness).translate((rack_end1.center().X, travel + rod_thickness * 1.5 + clearance / 2, rod_thickness / 2))
+rack_part += Box(rod_thickness * 2, rod_thickness - clearance, rod_thickness).translate((rack_end1.center().X, -(travel * 2 + rod_thickness * 1.5 + clearance / 2), rod_thickness / 2))
 
 # make an axle to hold the pinion
 axle_length = rod_thickness + clearance * 2
