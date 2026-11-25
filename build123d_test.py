@@ -26,12 +26,11 @@ module = rack_pitch / PI
 rack_movement = rack_teeth  # how many teeth to move along?
 axle_hole_radius = axle_radius + clearance
 
-prescaled_height = rod_thickness / module  # (rack.mesh_to() only support module=1)
-pinion = SpurGear(number_of_teeth=pinion_teeth, module=1, height=prescaled_height, backlash=clearance / 2)
-rack = InvoluteRack(number_of_teeth=rack_teeth, module=1, height=prescaled_height, backlash=clearance / 2)
+pinion = SpurGear(number_of_teeth=pinion_teeth, module=module, height=rod_thickness, backlash=clearance / 2)
+rack = InvoluteRack(number_of_teeth=rack_teeth, module=module, height=rod_thickness, backlash=clearance / 2)
 rack.mesh_to(pinion, target_dir=LEFT, offset=-rack_teeth / 2, backlash=clearance * 1.2, angle_bias=0)
-pinion_part = pinion.build_part().scale(module)
-rack_part = rack.build_part().scale(module)
+pinion_part = pinion.build_part()
+rack_part = rack.build_part()
 hole_obj = pinion.center_location_top * Hole(radius=axle_hole_radius, depth=rod_thickness)
 pinion_part = pinion_part.cut(hole_obj)
 
