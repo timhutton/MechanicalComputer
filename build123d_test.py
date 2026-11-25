@@ -51,12 +51,12 @@ rack_part += Box(rod_thickness, rod_thickness - clearance, rod_thickness).transl
 # make an axle to hold the pinion
 axle_length = rod_thickness + clearance * 2
 axle = Cylinder(radius=axle_radius, height=axle_length)
-axle_cap_radius = pinion.r_base
-axle_cap_length = clearance * 2
-axle_cap = Cylinder(radius=axle_cap_radius, height=axle_cap_length)
-axle_cap.location = Pos([0, 0, rod_thickness / 2 + clearance * 2])
-axle += axle_cap
-axle.location = Pos([0, 0, rod_thickness / 2])
+axle.location = Pos(0, 0, rod_thickness / 2)
+
+# make a sleeve to stop the pinion from sliding off the axle
+pinion_sleeve = Box(axle_radius * 2, pinion.r_base * 6, rod_thickness / 2).translate((0, 0, rod_thickness * 1.25 + clearance))
+pinion_sleeve += Box(axle_radius * 2, rod_thickness, rod_thickness + clearance * 2).translate((0, pinion.r_base * 3 - rod_thickness / 2, rod_thickness / 2))
+pinion_sleeve += Box(axle_radius * 2, rod_thickness, rod_thickness + clearance * 2).translate((0, -(pinion.r_base * 3 - rod_thickness / 2), rod_thickness / 2))
 
 # make sleeves to support the rod
 sleeve_sketch = Plane.XZ * Rectangle(rod_thickness * 2, rod_thickness * 2)
@@ -73,7 +73,7 @@ back_thickness = rod_thickness / 2
 back = Box(back_height, back_width, back_thickness)
 back.location = Pos(-back_height / 2 + axle_radius, 0, -(back_thickness /2 + clearance))
 
-support = back + axle + sleeve1 + sleeve2
+support = back + axle + pinion_sleeve + sleeve1 + sleeve2
 
 group = AnimationGroup(
     children={"rack": rack_part,
