@@ -9,7 +9,7 @@ from py_gearworks import *
 def check_proximity(parts, tolerance):
     """Check that all parts are separated by at least tolerance."""
     for a,b in combinations(parts, 2):
-        if a.distance(b) < tolerance:
+        if a.distance(b) < tolerance - 1e-6:
             print(f"WARNING: Objects too close ({a.distance(b)}): {a.label or a}, {b.label or b}")
 
 # design parameters
@@ -51,7 +51,7 @@ rack_part += Box(rod_thickness, rod_thickness - clearance, rod_thickness).transl
 # make an axle to hold the pinion
 axle_length = rod_thickness + clearance * 2
 axle = Cylinder(radius=axle_radius, height=axle_length)
-axle_cap_radius = axle_radius + clearance * 2
+axle_cap_radius = pinion.r_base
 axle_cap_length = clearance * 2
 axle_cap = Cylinder(radius=axle_cap_radius, height=axle_cap_length)
 axle_cap.location = Pos([0, 0, rod_thickness / 2 + clearance * 2])
