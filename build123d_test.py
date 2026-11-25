@@ -12,13 +12,40 @@ def check_proximity(parts, tolerance):
         if a.distance(b) < tolerance - 1e-6:
             print(f"WARNING: Objects too close ({a.distance(b)}): {a.label or a}, {b.label or b}")
 
+
+def check_connected(parts):
+    """Check that each part is a single connected piece."""
+    for part in parts:
+        if not len(part.solids()) == 1:
+            print(f"WARNING: Disconnected/empty part: {part.label or part}")
+
+
 # design parameters
-travel = 30  # mm distance the sensors move between 0 and 1
-rod_thickness = 6  # mm
-rack_teeth = 8  # per distance of travel
-pinion_teeth = 12
-clearance = 0.7  # mm - parts closer than this may fuse during MJF printing
-axle_radius = 3
+prototype_label = "B"
+if prototype_label == "A":
+    travel = 30  # mm distance the sensors move between 0 and 1
+    rod_thickness = 6  # mm
+    rack_teeth = 8  # per distance of travel
+    pinion_teeth = 12
+    clearance = 1.0  # mm - parts closer than this may fuse during MJF printing
+    axle_radius = 3
+    min_thickness = 2  # nothing should be thinner than this
+elif prototype_label == "B":
+    travel = 20  # mm distance the sensors move between 0 and 1
+    rod_thickness = 5  # mm
+    rack_teeth = 6  # per distance of travel
+    pinion_teeth = 10
+    clearance = 0.7  # mm - parts closer than this may fuse during MJF printing
+    axle_radius = 2
+    min_thickness = 2  # nothing should be thinner than this
+else:
+    travel = 15  # mm distance the sensors move between 0 and 1
+    rod_thickness = 4  # mm
+    rack_teeth = 6  # per distance of travel
+    pinion_teeth = 10
+    clearance = 0.5  # mm - parts closer than this may fuse during MJF printing
+    axle_radius = 2
+    min_thickness = 2  # nothing should be thinner than this
 
 # implications
 rack_pitch = travel / rack_teeth
@@ -31,6 +58,10 @@ rack = InvoluteRack(number_of_teeth=rack_teeth, module=module, height=rod_thickn
 rack.mesh_to(pinion, target_dir=LEFT, offset=-rack_teeth / 2, backlash=clearance * 1.2, angle_bias=0)
 pinion_part = pinion.build_part()
 rack_part = rack.build_part()
+
+# make a hole in the pinion for the axle
+if pinion.r_base - axle_hole_radius < min_thickness:
+    print("WARNING: Gear too small for safe axle")
 hole_obj = pinion.center_location_top * Hole(radius=axle_hole_radius, depth=rod_thickness)
 pinion_part = pinion_part.cut(hole_obj)
 
@@ -96,5 +127,6 @@ animation.animate(speed=1)
 # check tolerances and export to STL
 parts = group.children
 check_proximity(parts, tolerance=clearance)
+check_connected(parts)
 whole = reduce(lambda a, b: a + b, parts)
-export_stl(whole, "rack_pinion_test.stl")
+export_stl(whole, f"rack_pinion_test_{prototype_label}.stl")
