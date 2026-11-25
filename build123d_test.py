@@ -35,8 +35,10 @@ rack_part = rack.build_part().scale(module)
 hole_obj = pinion.center_location_top * Hole(radius=axle_hole_radius, depth=rod_thickness)
 pinion_part = pinion_part.cut(hole_obj)
 
+# make rack into a rod of the correct thickness
+rack_base_height = rack_part.edges().filter_by(Axis.X)[0].length
 rack_base = rack_part.faces().sort_by(Axis.X)[0]
-rack_part += extrude(rack_base, amount=rod_thickness * 0.8) # TODO: fix
+rack_part += extrude(rack_base, amount=rod_thickness - rack_base_height)
 rack_end1 = rack_part.faces().sort_by(Axis.Y)[0]
 rack_part += extrude(rack_end1, amount=travel)
 rack_end2 = rack_part.faces().sort_by(Axis.Y)[-1]
