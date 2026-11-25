@@ -29,7 +29,7 @@ if prototype_label == "A":
     pinion_teeth = 12
     clearance = 1.0  # mm - parts closer than this may fuse during MJF printing
     axle_radius = 3
-    min_thickness = 2  # nothing should be thinner than this
+    min_thickness = 3  # nothing should be thinner than this
 elif prototype_label == "B":
     travel = 20  # mm distance the sensors move between 0 and 1
     rod_thickness = 5  # mm
