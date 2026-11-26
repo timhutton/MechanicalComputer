@@ -2,6 +2,7 @@ from bd_animation import AnimationGroup, normalize_track
 from build123d import *
 from functools import reduce
 from itertools import combinations
+import math
 from ocp_vscode import Animation, show
 from py_gearworks import *
 
@@ -54,6 +55,7 @@ peg_values = [0] * num_pegs
 peg_values[2] = 1
 slot_width = 5
 track_thickness = 6
+sensor_clearance = clearance * 3
 
 # implications
 rack_pitch = travel / rack_teeth
@@ -62,6 +64,7 @@ rack_movement = rack_teeth  # how many teeth to move along?
 axle_hole_radius = axle_radius + clearance
 peg_radius = travel / 2 - clearance
 peg_height = peg_radius * peg_height_factor
+sensor_height = peg_height + rod_thickness + sensor_clearance
 slot_length = travel * 2
 track_width = travel * 3
 sensor_diag = travel * 2
@@ -141,6 +144,11 @@ for peg_idx in range(num_pegs):
         0))
     peg.label = f"peg.{peg_idx:03d}"
     parts += peg
+
+sensor = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_height, rotation=(0, 0, 45))
+sensor += Box(rod_thickness, travel * 5, rod_thickness).translate((0, -(sensor_diag - rod_thickness), sensor_height / 2 - rod_thickness / 2))
+sensor = sensor.translate((0, -travel / 2, track_thickness + sensor_height / 2 + clearance))
+parts += sensor
 
 if True:  # track test
     show(parts)
