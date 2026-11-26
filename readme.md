@@ -7,6 +7,8 @@ Videos: (click to play)
 <a href="https://www.youtube.com/shorts/iIKQuGVjefM"><img src="media/triangle.png" width="16%" /></a>
 <a href="https://www.youtube.com/watch?v=TBCexW6co-U"><img src="media/machine.png" width="50%" /></a>
 
+Discussion: https://mathstodon.xyz/@timhutton/117650488083356414
+
 ## Background:
 
 A few years ago I went to a talk by [Sydney Padua](https://en.wikipedia.org/wiki/Sydney_Padua), about [her book](https://en.wikipedia.org/wiki/The_Thrilling_Adventures_of_Lovelace_and_Babbage) and [the project](https://blog.plan28.org/) to build [Charles Babbage](https://en.wikipedia.org/wiki/Charles_Babbage)'s [Analytical Engine](https://en.wikipedia.org/wiki/Analytical_engine). She showed [some 3D animations](https://www.youtube.com/watch?v=gODpK9dTEWc) she had made of some parts of it. It was inspiring stuff and got me interested in the idea of making a mechanical computer. But Babbage's machine is enormous and may never be built!
