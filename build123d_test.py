@@ -49,7 +49,7 @@ else:
     min_thickness = 2  # nothing should be thinner than this
 
 peg_height_factor = 1
-peg_separation_factor = 1
+peg_separation_factor = 0.85
 num_pegs = 5
 peg_values = [0] * num_pegs
 peg_values[2] = 1
@@ -148,6 +148,7 @@ for peg_idx in range(num_pegs):
 sensor = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_height, rotation=(0, 0, 45))
 sensor += Box(rod_thickness, travel * 5, rod_thickness).translate((0, -(sensor_diag - rod_thickness), sensor_height / 2 - rod_thickness / 2))
 sensor = sensor.translate((0, -travel / 2, track_thickness + sensor_height / 2 + clearance))
+sensor = sensor.translate((peg_separation / 2, travel / 2, 0))  # move to check it fits between two pegs
 parts += sensor
 
 if True:  # track test
