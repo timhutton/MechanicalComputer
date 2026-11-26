@@ -128,13 +128,18 @@ track = extrude(track_sketch, track_thickness)
 parts = [track]
 
 for peg_idx in range(num_pegs):
-    peg = Cylinder(peg_radius, peg_height)
-    peg = peg.translate((0, 0, track_thickness + peg_height / 2 + clearance))
-    peg += Cylinder(peg_foot_radius, track_thickness + clearance * 2)
+    peg_head = Cylinder(peg_radius, peg_height)
+    peg_head = peg_head.translate((0, 0, track_thickness + peg_height / 2 + clearance))
+    peg_foot = Cylinder(peg_foot_radius, track_thickness + clearance * 2).\
+        translate((0, 0, track_thickness / 2))
+    peg_root = Cylinder(peg_radius, peg_height / 2)
+    peg_root = peg_root.translate((0, 0, - (peg_height / 4 + clearance)))
+    peg = peg_head + peg_foot + peg_root
     peg = peg.translate(\
         (peg_separation * (peg_idx - (num_pegs - 1) / 2),\
         -slot_length / 2 + slot_length * peg_values[peg_idx],\
         0))
+    peg.label = f"peg.{peg_idx:03d}"
     parts += peg
 
 if True:  # track test
