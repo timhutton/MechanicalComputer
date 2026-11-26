@@ -47,11 +47,26 @@ else:
     axle_radius = 2
     min_thickness = 2  # nothing should be thinner than this
 
+peg_height_factor = 1
+peg_separation_factor = 1
+num_pegs = 5
+peg_values = [0] * num_pegs
+peg_values[2] = 1
+slot_width = 5
+track_thickness = 6
+
 # implications
 rack_pitch = travel / rack_teeth
 module = rack_pitch / PI
 rack_movement = rack_teeth  # how many teeth to move along?
 axle_hole_radius = axle_radius + clearance
+peg_radius = travel / 2 - clearance
+peg_height = peg_radius * peg_height_factor
+slot_length = travel * 2
+track_width = travel * 3
+sensor_diag = travel * 2
+peg_separation = sensor_diag * peg_separation_factor
+peg_foot_radius = slot_width / 2 - clearance
 
 pinion = SpurGear(number_of_teeth=pinion_teeth, module=module, height=rod_thickness, backlash=clearance / 2)
 rack = InvoluteRack(number_of_teeth=rack_teeth, module=module, height=rod_thickness, backlash=clearance / 2)
@@ -105,28 +120,48 @@ back.location = Pos(-back_height / 2 + axle_radius, 0, -(back_thickness /2 + cle
 
 support = back + axle + pinion_sleeve + sleeve1 + sleeve2
 
-group = AnimationGroup(
-    children={"rack": rack_part,
-              "pinion": pinion_part,
-              "support": support},
-    label="assembly"
-)
-show(group)
+track_sketch = Rectangle(peg_separation * (num_pegs + 1), track_width) - \
+    GridLocations(peg_separation, 0, num_pegs, 1) * \
+    SlotOverall(width = slot_length + slot_width, height = slot_width, rotation=90)
+track = extrude(track_sketch, track_thickness)
 
-steps = 60
-time_track = np.linspace(0, 5, steps + 1)
-y_positions = np.linspace(0, rack_pitch * rack_movement, steps + 1)
-pinion_rotation = -360 * rack_movement / pinion_teeth
-rotation_track = np.linspace(0, pinion_rotation, steps + 1)
+parts = [track]
 
-animation = Animation()
-animation.add_track("/assembly/rack", "ty", time_track, normalize_track(y_positions))
-animation.add_track("/assembly/pinion", "rz", time_track, normalize_track(rotation_track))
-animation.animate(speed=1)
+for peg_idx in range(num_pegs):
+    peg = Cylinder(peg_radius, peg_height)
+    peg = peg.translate((0, 0, track_thickness + peg_height / 2 + clearance))
+    peg += Cylinder(peg_foot_radius, track_thickness + clearance * 2)
+    peg = peg.translate(\
+        (peg_separation * (peg_idx - (num_pegs - 1) / 2),\
+        -slot_length / 2 + slot_length * peg_values[peg_idx],\
+        0))
+    parts += peg
 
-# check tolerances and export to STL
-parts = group.children
-check_proximity(parts, tolerance=clearance)
-check_connected(parts)
-whole = reduce(lambda a, b: a + b, parts)
-export_stl(whole, f"rack_pinion_test_{prototype_label}.stl")
+if True:  # track test
+    show(parts)
+else:  # rack and pinion test
+    group = AnimationGroup(
+        children={"rack": rack_part,
+                "pinion": pinion_part,
+                "support": support},
+        label="assembly"
+    )
+    show(group)
+
+    steps = 60
+    time_track = np.linspace(0, 5, steps + 1)
+    y_positions = np.linspace(0, travel, steps + 1)
+    pinion_rotation = -360 * rack_movement / pinion_teeth
+    rotation_track = np.linspace(0, pinion_rotation, steps + 1)
+
+    animation = Animation()
+    animation.add_track("/assembly/rack", "ty", time_track, normalize_track(y_positions))
+    animation.add_track("/assembly/pinion", "rz", time_track, normalize_track(rotation_track))
+    animation.animate(speed=1)
+
+    # check tolerances and export to STL
+    parts = group.children
+    check_proximity(parts, tolerance=clearance)
+    check_connected(parts)
+    whole = reduce(lambda a, b: a + b, parts)
+    export_stl(whole, f"rack_pinion_test_{prototype_label}.stl")
