@@ -53,9 +53,11 @@ peg_separation_factor = 0.85
 num_pegs = 5
 peg_values = [0] * num_pegs
 peg_values[2] = 1
-slot_width = 5
+peg_foot_radius = 3
 track_thickness = 6
 sensor_clearance = clearance * 3
+updater_rod_thickness = 7
+temp_track_offset = (0, -travel * 4, 0)
 
 # implications
 rack_pitch = travel / rack_teeth
@@ -64,12 +66,12 @@ rack_movement = rack_teeth  # how many teeth to move along?
 axle_hole_radius = axle_radius + clearance
 peg_radius = travel / 2 - clearance
 peg_height = peg_radius * peg_height_factor
-sensor_height = peg_height + rod_thickness + sensor_clearance
+sensor_height = peg_height + updater_rod_thickness + sensor_clearance
+slot_width = peg_foot_radius * 2 + clearance * 2
 slot_length = travel * 2
 track_width = travel * 3
 sensor_diag = travel * 2
 peg_separation = sensor_diag * peg_separation_factor
-peg_foot_radius = slot_width / 2 - clearance
 
 pinion = SpurGear(number_of_teeth=pinion_teeth, module=module, height=rod_thickness, backlash=clearance / 2)
 rack = InvoluteRack(number_of_teeth=rack_teeth, module=module, height=rod_thickness, backlash=clearance / 2)
@@ -144,12 +146,18 @@ for peg_idx in range(num_pegs):
         0))
     peg.label = f"peg.{peg_idx:03d}"
     parts += peg
+    temp_peg = peg.translate(temp_track_offset)
+    parts += temp_peg
 
 sensor = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_height, rotation=(0, 0, 45))
-sensor += Box(rod_thickness, travel * 5, rod_thickness).translate((0, -(sensor_diag - rod_thickness), sensor_height / 2 - rod_thickness / 2))
-sensor = sensor.translate((0, -travel / 2, track_thickness + sensor_height / 2 + clearance))
+sensor += Box(updater_rod_thickness, travel * 5, updater_rod_thickness).translate((0, 0, sensor_height / 2 - updater_rod_thickness / 2))
+sensor = sensor.translate((0, -travel / 2, track_thickness + sensor_height / 2 + clearance * 2))
 sensor = sensor.translate((peg_separation / 2, travel / 2, 0))  # move to check it fits between two pegs
+# TODO: hollow out sensor
 parts += sensor
+
+track2 = track.translate(temp_track_offset)
+parts += track2
 
 if True:  # track test
     show(parts)
