@@ -50,9 +50,9 @@ else:
 
 peg_height_factor = 1
 peg_separation_factor = 0.85
-num_pegs = 5
+num_pegs = 3
 peg_values = [0] * num_pegs
-peg_values[2] = 1
+peg_values[1] = 1
 peg_foot_radius = 3
 track_thickness = 6
 sensor_clearance = clearance * 3
@@ -125,12 +125,13 @@ back.location = Pos(-back_height / 2 + axle_radius, 0, -(back_thickness /2 + cle
 
 support = back + axle + pinion_sleeve + sleeve1 + sleeve2
 
-track_sketch = Rectangle(peg_separation * (num_pegs + 1), track_width) - \
+track_sketch = Rectangle(peg_separation * (num_pegs + 1), np.linalg.norm(temp_track_offset)) - \
     GridLocations(peg_separation, 0, num_pegs, 1) * \
     SlotOverall(width = slot_length + slot_width, height = slot_width, rotation=90)
 track = extrude(track_sketch, track_thickness)
+track2 = track.translate(temp_track_offset)
 
-parts = [track]
+parts = [track + track2]
 
 for peg_idx in range(num_pegs):
     peg_head = Cylinder(peg_radius, peg_height)
@@ -152,12 +153,9 @@ for peg_idx in range(num_pegs):
 sensor = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_height, rotation=(0, 0, 45))
 sensor += Box(updater_rod_thickness, travel * 5, updater_rod_thickness).translate((0, 0, sensor_height / 2 - updater_rod_thickness / 2))
 sensor = sensor.translate((0, -travel / 2, track_thickness + sensor_height / 2 + clearance * 2))
-sensor = sensor.translate((peg_separation / 2, travel / 2, 0))  # move to check it fits between two pegs
+#sensor = sensor.translate((peg_separation / 2, travel / 2, 0))  # move to check it fits between two pegs
 # TODO: hollow out sensor
 parts += sensor
-
-track2 = track.translate(temp_track_offset)
-parts += track2
 
 if True:  # track test
     show(parts)
