@@ -162,16 +162,18 @@ sensor = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_heig
 # TODO: hollow out sensor
 updater_rod_center_z = sensor_height / 2 - updater_rod_thickness / 2
 updater_rod = Box(updater_rod_thickness, travel * 3 + track_width + np.linalg.norm(temp_track_offset), updater_rod_thickness)\
-    .translate((0, -track_width / 2, updater_rod_center_z))
+    .translate((0, -track_width / 2 - travel / 2, updater_rod_center_z))
 updater = sensor + updater_rod
 updater = updater.translate((0, -travel / 2, track_thickness + sensor_height / 2 + clearance * 2))
 updater_rod_center_z += track_thickness + sensor_height / 2 + clearance * 2
 #updater = updater.translate((peg_separation / 2, travel / 2, 0))  # move to check it fits between two pegs
+#updater = updater.translate((peg_separation, travel, 0))  # move to next peg
 parts += updater
 
 updater_sleeve = Box(updater_rod_thickness * 2, updater_rod_thickness, updater_rod_thickness * 2)\
     - Box(updater_rod_thickness + clearance * 2, updater_rod_thickness, updater_rod_thickness + clearance * 2)
-updater_sleeve = updater_sleeve.translate((0, np.linalg.norm(temp_track_offset) / 2, updater_rod_center_z))
+updater_sleeve = updater_sleeve.translate((updater.center().X, np.linalg.norm(temp_track_offset) / 2, updater_rod_center_z))
+updater_sleeve += updater_sleeve.translate((0, -np.linalg.norm(temp_track_offset) * 2, 0))
 parts += updater_sleeve
 
 if True:  # track test
