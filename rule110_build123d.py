@@ -128,10 +128,12 @@ support = back + axle + pinion_sleeve + sleeve1 + sleeve2
 track_sketch = Rectangle(peg_separation * (num_pegs + 1), temp_track_offset) - \
     GridLocations(peg_separation, 0, num_pegs, 1) * \
     SlotOverall(width = slot_length + slot_width, height = slot_width, rotation=90)
-track = extrude(track_sketch, track_thickness)
-track2 = track.translate((0, -temp_track_offset, 0))
+track1 = extrude(track_sketch, track_thickness)
+track2 = track1.translate((0, -temp_track_offset, 0))
+track = track1 + track2
+track.label = "track"
 
-parts = [track + track2]
+parts = [track]
 
 for peg_idx in range(num_pegs):
     peg_head = Cylinder(peg_radius, peg_height)
@@ -145,18 +147,19 @@ for peg_idx in range(num_pegs):
         (peg_separation * (peg_idx - (num_pegs - 1) / 2),\
         0,\
         0))
-    peg.label = f"peg.{peg_idx:03d}"
     temp_peg = peg.translate((0, -temp_track_offset, 0))
     temp_peg = temp_peg.translate(\
         (0,\
         -slot_length / 2 + slot_length * (1 - peg_values[peg_idx]),\
         0))
-    parts += temp_peg
+    peg.label = f"temp_peg.{peg_idx:03d}"
+    parts.append(temp_peg)
     peg = peg.translate(\
         (0,\
         -slot_length / 2 + slot_length * peg_values[peg_idx],\
         0))
-    parts += peg
+    peg.label = f"peg.{peg_idx:03d}"
+    parts.append(peg)
 
 sensor = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_height, rotation=(0, 0, 45))
 # TODO: hollow out sensor
@@ -168,17 +171,21 @@ updater = updater.translate((0, -travel / 2, track_thickness + sensor_height / 2
 updater_rod_center_z += track_thickness + sensor_height / 2 + clearance * 2
 #updater = updater.translate((peg_separation / 2, travel / 2, 0))  # move to check it fits between two pegs
 #updater = updater.translate((peg_separation, travel, 0))  # move to next peg
-parts += updater
+parts.append(updater)
 
 updater_sleeve = Box(updater_rod_thickness * 2, updater_rod_thickness, updater_rod_thickness * 2)\
     - Box(updater_rod_thickness + clearance * 2, updater_rod_thickness, updater_rod_thickness + clearance * 2)
 updater_sleeve = updater_sleeve.translate((updater.center().X, temp_track_offset / 2, updater_rod_center_z))
 updater_sleeve += updater_sleeve.translate((0, -temp_track_offset * 2, 0))
 edge_slider = Box(peg_separation, updater_rod_thickness * 2, updater_rod_thickness * 2 + track_thickness + clearance * 2)\
-    .translate((0, temp_track_offset / 2, track_thickness / 2))
-parts += updater_sleeve + edge_slider
+    .translate((0, temp_track_offset / 2, track_thickness / 2))# + updater_rod_thickness / 3))
+carriage = updater_sleeve + edge_slider
+carriage.label = "carriage"
+parts.append(carriage)
 
 if True:  # track test
+    check_proximity(parts, tolerance=clearance)
+    check_connected(parts)
     show(parts)
 else:  # rack and pinion test
     group = AnimationGroup(
