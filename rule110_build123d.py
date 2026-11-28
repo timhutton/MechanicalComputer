@@ -21,6 +21,12 @@ def check_connected(parts):
             print(f"WARNING: Disconnected/empty part: {part.label or part}")
 
 
+def random_colors(parts):
+    """Give each part a random color."""
+    for part in parts:
+        part.color = Color(*(np.random.random(3) / 2 + 0.5))
+
+
 # design parameters
 prototype_label = "B"
 if prototype_label == "A":
@@ -53,6 +59,8 @@ peg_separation_factor = 0.85
 num_pegs = 3
 peg_values = [0] * num_pegs
 peg_values[1] = 1
+temp_peg_values = [1] * num_pegs
+temp_peg_values[1] = 0.25
 peg_foot_radius = 3
 track_thickness = 6
 sensor_clearance = clearance * 3
@@ -150,7 +158,7 @@ for peg_idx in range(num_pegs):
     temp_peg = peg.translate((0, -temp_track_offset, 0))
     temp_peg = temp_peg.translate(\
         (0,\
-        -slot_length / 2 + slot_length * (1 - peg_values[peg_idx]),\
+        -slot_length / 2 + slot_length * temp_peg_values[peg_idx],\
         0))
     peg.label = f"temp_peg.{peg_idx:03d}"
     parts.append(temp_peg)
@@ -166,6 +174,7 @@ sensor = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_heig
 updater_rod_center_z = sensor_height / 2 - updater_rod_thickness / 2
 updater_rod = Box(updater_rod_thickness, travel * 3 + track_width + temp_track_offset, updater_rod_thickness)\
     .translate((0, -track_width / 2 - travel / 2, updater_rod_center_z))
+actuator = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_height, rotation=(0, 0, 45))
 updater = sensor + updater_rod
 updater = updater.translate((0, -travel / 2, track_thickness + sensor_height / 2 + clearance * 2))
 updater_rod_center_z += track_thickness + sensor_height / 2 + clearance * 2
@@ -178,7 +187,7 @@ updater_sleeve = Box(updater_rod_thickness * 2, updater_rod_thickness, updater_r
 updater_sleeve = updater_sleeve.translate((updater.center().X, temp_track_offset / 2, updater_rod_center_z))
 updater_sleeve += updater_sleeve.translate((0, -temp_track_offset * 2, 0))
 edge_slider = Box(peg_separation, updater_rod_thickness * 2, updater_rod_thickness * 2 + track_thickness + clearance * 2)\
-    .translate((0, temp_track_offset / 2, track_thickness / 2))# + updater_rod_thickness / 3))
+    .translate((0, temp_track_offset / 2, track_thickness / 2 + updater_rod_thickness / 3))
 carriage = updater_sleeve + edge_slider
 carriage.label = "carriage"
 parts.append(carriage)
@@ -186,6 +195,7 @@ parts.append(carriage)
 if True:  # track test
     check_proximity(parts, tolerance=clearance)
     check_connected(parts)
+    random_colors(parts)
     show(parts)
 else:  # rack and pinion test
     group = AnimationGroup(
