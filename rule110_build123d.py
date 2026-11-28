@@ -57,7 +57,7 @@ peg_foot_radius = 3
 track_thickness = 6
 sensor_clearance = clearance * 3
 updater_rod_thickness = 7
-temp_track_offset = (0, -travel * 4, 0)
+temp_track_offset = travel * 4
 
 # implications
 rack_pitch = travel / rack_teeth
@@ -125,11 +125,11 @@ back.location = Pos(-back_height / 2 + axle_radius, 0, -(back_thickness /2 + cle
 
 support = back + axle + pinion_sleeve + sleeve1 + sleeve2
 
-track_sketch = Rectangle(peg_separation * (num_pegs + 1), np.linalg.norm(temp_track_offset)) - \
+track_sketch = Rectangle(peg_separation * (num_pegs + 1), temp_track_offset) - \
     GridLocations(peg_separation, 0, num_pegs, 1) * \
     SlotOverall(width = slot_length + slot_width, height = slot_width, rotation=90)
 track = extrude(track_sketch, track_thickness)
-track2 = track.translate(temp_track_offset)
+track2 = track.translate((0, -temp_track_offset, 0))
 
 parts = [track + track2]
 
@@ -146,7 +146,7 @@ for peg_idx in range(num_pegs):
         0,\
         0))
     peg.label = f"peg.{peg_idx:03d}"
-    temp_peg = peg.translate(temp_track_offset)
+    temp_peg = peg.translate((0, -temp_track_offset, 0))
     temp_peg = temp_peg.translate(\
         (0,\
         -slot_length / 2 + slot_length * (1 - peg_values[peg_idx]),\
@@ -161,7 +161,7 @@ for peg_idx in range(num_pegs):
 sensor = Box(sensor_diag / math.sqrt(2), sensor_diag / math.sqrt(2), sensor_height, rotation=(0, 0, 45))
 # TODO: hollow out sensor
 updater_rod_center_z = sensor_height / 2 - updater_rod_thickness / 2
-updater_rod = Box(updater_rod_thickness, travel * 3 + track_width + np.linalg.norm(temp_track_offset), updater_rod_thickness)\
+updater_rod = Box(updater_rod_thickness, travel * 3 + track_width + temp_track_offset, updater_rod_thickness)\
     .translate((0, -track_width / 2 - travel / 2, updater_rod_center_z))
 updater = sensor + updater_rod
 updater = updater.translate((0, -travel / 2, track_thickness + sensor_height / 2 + clearance * 2))
@@ -172,9 +172,11 @@ parts += updater
 
 updater_sleeve = Box(updater_rod_thickness * 2, updater_rod_thickness, updater_rod_thickness * 2)\
     - Box(updater_rod_thickness + clearance * 2, updater_rod_thickness, updater_rod_thickness + clearance * 2)
-updater_sleeve = updater_sleeve.translate((updater.center().X, np.linalg.norm(temp_track_offset) / 2, updater_rod_center_z))
-updater_sleeve += updater_sleeve.translate((0, -np.linalg.norm(temp_track_offset) * 2, 0))
-parts += updater_sleeve
+updater_sleeve = updater_sleeve.translate((updater.center().X, temp_track_offset / 2, updater_rod_center_z))
+updater_sleeve += updater_sleeve.translate((0, -temp_track_offset * 2, 0))
+edge_slider = Box(peg_separation, updater_rod_thickness * 2, updater_rod_thickness * 2 + track_thickness + clearance * 2)\
+    .translate((0, temp_track_offset / 2, track_thickness / 2))
+parts += updater_sleeve + edge_slider
 
 if True:  # track test
     show(parts)
